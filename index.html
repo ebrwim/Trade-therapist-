@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چک‌لیست ترید تراپیست</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #06b6d4;
+            --border-color: #334155;
+            --text-muted: #94a3b8;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --info-color: #3b82f6;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border-color);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        header h1 {
+            font-size: 1.3rem;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background-color: #1e293b;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border-color: var(--accent-color);
+        }
+
+        .checklist-container {
+            display: none;
+        }
+
+        .checklist-container.active {
+            display: block;
+        }
+
+        /* Distinct Phase Block Styling for Trade Checklist */
+        .phase-block {
+            background-color: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .phase-title {
+            font-size: 0.9rem;
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .section-title {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            margin: 16px 0 8px 0;
+            padding-bottom: 4px;
+            border-bottom: 1px dashed var(--border-color);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .task-card {
+            display: flex;
+            align-items: center;
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .task-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .flow-box {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .flow-box:last-child {
+            margin-bottom: 0;
+        }
+
+        .flow-box-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* 5-Second Timer Bar Style */
+        .interval-timer-card {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .timer-msg {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .timer-circle-container {
+            position: relative;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .timer-svg {
+            transform: rotate(-90deg);
+        }
+
+        .timer-bg-circle {
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 3;
+        }
+
+        .timer-fill-circle {
+            fill: none;
+            stroke: var(--warning-color);
+            stroke-width: 3;
+            stroke-dasharray: 62.8;
+            stroke-dashoffset: 62.8;
+            stroke-linecap: round;
+            animation: loopTimer 5s linear infinite;
+        }
+
+        @keyframes loopTimer {
+            0% { stroke-dashoffset: 62.8; }
+            100% { stroke-dashoffset: 0; }
+        }
+
+        .question-card {
+            display: flex;
+            align-items: center;
+            background-color: #1e293b;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .question-icon {
+            font-size: 1.1rem;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .task-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .task-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .task-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+            font-weight: 500;
+        }
+
+        .decision-group {
+            margin-top: 8px;
+        }
+
+        .decision-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .decision-options {
+            display: flex;
+            gap: 6px;
+        }
+
+        .opt-btn {
+            flex: 1;
+            padding: 6px 4px;
+            background-color: #1e293b;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .opt-btn.selected {
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border-color: var(--accent-color);
+        }
+
+        .opt-btn.selected-warning {
+            background-color: var(--warning-color);
+            color: #0f172a;
+            border-color: var(--warning-color);
+        }
+
+        .opt-btn.selected-info {
+            background-color: var(--info-color);
+            color: #f8fafc;
+            border-color: var(--info-color);
+        }
+
+        .warning-msg {
+            display: none;
+            margin-top: 8px;
+            padding: 8px;
+            background-color: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning-color);
+            color: var(--warning-color);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.5;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        .info-msg {
+            display: none;
+            margin-top: 8px;
+            padding: 8px;
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--info-color);
+            color: #93c5fd;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.5;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Final Checklist Styling */
+        .final-checklist-box {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .final-item {
+            margin-bottom: 10px;
+        }
+
+        .final-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .final-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 4px;
+        }
+
+        .final-header label {
+            cursor: pointer;
+        }
+
+        .final-checkbox {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background-color: #1e293b;
+        }
+
+        .final-checkbox:checked {
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .final-checkbox:checked::after {
+            content: "✓";
+            color: #0f172a;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .final-input {
+            width: 100%;
+            background-color: #1e293b;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 6px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            outline: none;
+            transition: all 0.2s;
+            margin-right: 24px;
+            width: calc(100% - 24px);
+        }
+
+        .final-input:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 4px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Saved Trades Section */
+        .history-section {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 20px;
+        }
+
+        .history-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .history-header {
+            padding: 10px 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .history-header:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .history-arrow {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .history-item.open .history-arrow {
+            transform: rotate(180deg);
+        }
+
+        .history-details {
+            display: none;
+            padding: 12px;
+            background-color: #0f172a;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            line-height: 1.6;
+        }
+
+        .history-item.open .history-details {
+            display: block;
+        }
+
+        .summary-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 4px;
+        }
+
+        .badge-data { background-color: rgba(6, 182, 212, 0.2); color: var(--accent-color); }
+        .badge-setup { background-color: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+        .badge-indecision { background-color: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
+        .badge-observer { background-color: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+        .badge-mind { background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .detail-card {
+            background-color: var(--card-bg);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .detail-card-title {
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-card-note {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-btn {
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            margin-left: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+        }
+
+        /* Completed Task Style */
+        .task-card.completed {
+            border-color: #059669;
+            opacity: 0.85;
+        }
+
+        .task-card.completed .task-title {
+            color: var(--text-muted);
+            text-decoration: line-through;
+        }
+
+        .task-card.completed .task-meta {
+            color: #059669;
+        }
+
+        /* Chart Section Style */
+        .chart-box {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .chart-visual {
+            position: relative;
+            width: 100px;
+            height: 100px;
+        }
+
+        .chart-svg {
+            transform: rotate(-90deg);
+        }
+
+        .chart-bg-circle {
+            fill: none;
+            stroke: #1e293b;
+            stroke-width: 8;
+        }
+
+        .chart-fill-circle {
+            fill: none;
+            stroke: var(--success-color);
+            stroke-width: 8;
+            stroke-dasharray: 251.2;
+            stroke-dashoffset: 251.2;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.5s ease-out;
+        }
+
+        .chart-percentage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        .chart-info {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .chart-info-item {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .dot-done {
+            width: 10px;
+            height: 10px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+        }
+
+        .dot-todo {
+            width: 10px;
+            height: 10px;
+            background-color: var(--danger-color);
+            border-radius: 50%;
+        }
+
+        footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .reset-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--danger-color);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .reset-btn:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <header>
+        <h1>چک‌لیست ترید تراپیست</h1>
+    </header>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('trade')">چک‌لیست ترید</button>
+        <button class="tab-btn" onclick="switchTab('dev')">چک‌لیست تمرینات روزانه</button>
+    </div>
+
+    <!-- Trade Checklist -->
+    <div id="trade-checklist" class="checklist-container active"></div>
+
+    <!-- Development Checklist -->
+    <div id="dev-checklist" class="checklist-container">
+        <div id="dev-tasks-list"></div>
+        <!-- Dynamic Pie/Donut Chart Area -->
+        <div class="chart-box">
+            <div class="chart-visual">
+                <svg class="chart-svg" width="100" height="100" viewBox="0 0 100 100">
+                    <circle class="chart-bg-circle" cx="50" cy="50" r="40" />
+                    <circle id="chart-progress" class="chart-fill-circle" cx="50" cy="50" r="40" />
+                </svg>
+                <div id="chart-text" class="chart-percentage">0%</div>
+            </div>
+            <div class="chart-info">
+                <div class="chart-info-item">
+                    <span class="dot-done"></span>
+                    <span id="chart-done-count">انجام شده: 0 تمرین</span>
+                </div>
+                <div class="chart-info-item">
+                    <span class="dot-todo"></span>
+                    <span id="chart-todo-count">باقی‌مانده: 0 تمرین</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5 Last Trades History Section (Fixed at bottom of both checklists) -->
+    <div class="history-section">
+        <div class="history-title">📊 ۵ معامله آخر (تاریخچه)</div>
+        <div id="history-container" class="history-list"></div>
+    </div>
+
+    <footer>
+        <p>تغییرات به صورت خودکار ذخیره می‌شوند.</p>
+        <button id="dynamic-reset-btn" class="reset-btn" onclick="resetActiveChecklist()">🔄 ریست کردن چک‌لیست ترید</button>
+    </footer>
+</div>
+
+<script>
+    // datasets
+    const defaultTradeTasks = [
+        // Pre-trade tasks
+        { id: 1, title: "مدیتیشن و تمرکز ذهنی", meta: "آرامش درونی و حضور صد درصدی در لحظه حال", category: "pre", completed: false },
+        { id: 17, title: "مرور یک باور ثروت و موفقیت", meta: "همراستا کردن ذهن با فرکانس فراوانی و لیاقت", category: "pre", completed: false },
+        { id: 18, title: "ثبت وضعیت درونی (ذهن، احساس و بدن)", meta: "اسکن خودکار؛ آیا در صلح هستم یا تحت فشار تنش فیزیکی؟", category: "pre", completed: false },
+        { id: 19, title: "ارزیابی بازار امروز (واضح یا مبهم؟)", meta: "تشخیص میزان شفافیت ساختار چارت قبل از لمس دکمه معامله", category: "pre", completed: false },
+        
+        // Post-trade tasks
+        { id: 8, title: "ثبت دقیق معامله همراه با دلیل روانشناختی در ژورنال", meta: "ژورنال‌نویسی", category: "post", completed: false }
+    ];
+
+    const defaultDevTasks = [
+        // Morning Category
+        { id: 9, title: "بیدار شدن ساعت ۵ صبح", meta: "تمرینات صبحگاهی", category: "morning", completed: false },
+        { id: 10, title: "لبخند زدن", meta: "تمرینات صبحگاهی", category: "morning", completed: false },
+        { id: 13, title: "مدیتیشن", meta: "تمرینات صبحگاهی", category: "morning", completed: false },
+        { id: 11, title: "۲ صفحه نوشتن", meta: "خودکاوی و مکتوب کردن ذهن", category: "morning", completed: false },
+        { id: 12, title: "ارسال ویس باور", meta: "تثبیت کدهای روانشناختی", category: "morning", completed: false },
+        
+        // Daily Category
+        { id: 14, title: "ورزش", meta: "تمرینات روزانه", category: "daily", completed: false },
+        { id: 15, title: "مطالعه کتاب", meta: "تمرینات روزانه", category: "daily", completed: false },
+        { id: 16, title: "خلوت با خود", meta: "تمرینات روزانه", category: "daily", completed: false }
+    ];
+
+    let activeTab = 'trade';
+
+    // Storage version updated to v18 for clean integration of 5 last trades
+    let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v18')) || defaultTradeTasks;
+    let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v18')) || defaultDevTasks;
+    let selectedDecision = localStorage.getItem('selected_decision_v18') || null;
+    let selectedState = localStorage.getItem('selected_state_v18') || null;
+    let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v18')) || [];
+
+    // Final Checklist States
+    let finalChecks = JSON.parse(localStorage.getItem('final_checks_v18')) || {
+        input: { checked: false, note: "" },
+        interpretation: { checked: false, note: "" },
+        decision: { checked: false, note: "" },
+        feedback: { checked: false, note: "" },
+        learning: { checked: false, note: "" }
+    };
+
+    function saveToStorage() {
+        localStorage.setItem('trade_tasks_v18', JSON.stringify(tradeTasks));
+        localStorage.setItem('dev_tasks_v18', JSON.stringify(devTasks));
+        localStorage.setItem('final_checks_v18', JSON.stringify(finalChecks));
+        localStorage.setItem('saved_trades_v18', JSON.stringify(savedTrades));
+        if (selectedDecision) {
+            localStorage.setItem('selected_decision_v18', selectedDecision);
+        } else {
+            localStorage.removeItem('selected_decision_v18');
+        }
+        if (selectedState) {
+            localStorage.setItem('selected_state_v18', selectedState);
+        } else {
+            localStorage.removeItem('selected_state_v18');
+        }
+    }
+
+    function updateChart() {
+        const total = devTasks.length;
+        const completedCount = devTasks.filter(t => t.completed).length;
+        const todoCount = total - completedCount;
+        const percentage = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+        const circumference = 2 * Math.PI * 40;
+        const offset = circumference - (percentage / 100) * circumference;
+
+        document.getElementById('chart-progress').style.strokeDashoffset = offset;
+        document.getElementById('chart-text').innerText = `${percentage}%`;
+        document.getElementById('chart-done-count').innerText = `انجام شده: ${completedCount} تمرین`;
+        document.getElementById('chart-todo-count').innerText = `باقی‌مانده: ${todoCount} تمرین`;
+    }
+
+    function selectDecision(option) {
+        selectedDecision = option;
+        saveToStorage();
+        
+        document.querySelectorAll('.opt-decision-btn').forEach(btn => {
+            btn.classList.remove('selected', 'selected-warning');
+            const btnVal = btn.getAttribute('data-value');
+            if (btnVal === option) {
+                if (option === 'indecision') {
+                    btn.classList.add('selected-warning');
+                } else {
+                    btn.classList.add('selected');
+                }
+            }
+        });
+
+        const warningEl = document.getElementById('warning-msg-box');
+        if (option === 'indecision') {
+            warningEl.style.display = 'block';
+        } else {
+            warningEl.style.display = 'none';
+        }
+    }
+
+    function selectState(option) {
+        selectedState = option;
+        saveToStorage();
+
+        document.querySelectorAll('.opt-state-btn').forEach(btn => {
+            btn.classList.remove('selected', 'selected-info');
+            const btnVal = btn.getAttribute('data-value');
+            if (btnVal === option) {
+                if (option === 'mind') {
+                    btn.classList.add('selected-info');
+                } else {
+                    btn.classList.add('selected');
+                }
+            }
+        });
+
+        const infoEl = document.getElementById('info-msg-box');
+        if (option === 'mind') {
+            infoEl.style.display = 'block';
+        } else {
+            infoEl.style.display = 'none';
+        }
+    }
+
+    function handleFinalCheckChange(key, type, value) {
+        if (type === 'checked') {
+            finalChecks[key].checked = value;
+        } else if (type === 'note') {
+            finalChecks[key].note = value;
+        }
+        saveToStorage();
+    }
+
+    function toggleHistoryItem(index) {
+        const item = document.getElementById(`history-item-${index}`);
+        if (item) {
+            item.classList.toggle('open');
+        }
+    }
+
+    function renderSavedTrades() {
+        const container = document.getElementById('history-container');
+        if (savedTrades.length === 0) {
+            container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.75rem; padding: 10px;">هنوز معامله‌ای ثبت نشده است. پس از ریست کردن چک‌لیست ترید، معامله شما اینجا آرشیو می‌شود.</div>`;
+            return;
+        }
+
+        const translateDecision = (val) => {
+            if (val === 'data') return { text: 'داده', badge: 'badge-data' };
+            if (val === 'setup') return { text: 'ستاپ', badge: 'badge-setup' };
+            if (val === 'indecision') return { text: 'بی‌تصمیمی', badge: 'badge-indecision' };
+            return { text: 'ثبت‌نشده', badge: '' };
+        };
+
+        const translateState = (val) => {
+            if (val === 'observer') return { text: 'شاهد و ناظر', badge: 'badge-observer' };
+            if (val === 'mind') return { text: 'درگیر افکار', badge: 'badge-mind' };
+            return { text: 'ثبت‌نشده', badge: '' };
+        };
+
+        container.innerHTML = savedTrades.map((trade, index) => {
+            const decInfo = translateDecision(trade.decision);
+            const stateInfo = translateState(trade.state);
+
+            return `
+                <div class="history-item" id="history-item-${index}">
+                    <div class="history-header" onclick="toggleHistoryItem(${index})">
+                        <div>
+                            <span style="color: var(--accent-color);">🕒 ${trade.timestamp}</span>
+                        </div>
+                        <span class="history-arrow">▼</span>
+                    </div>
+                    <div class="history-details">
+                        <div style="margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+                            <strong>مبنای ورود:</strong> <span class="summary-badge ${decInfo.badge}">${decInfo.text}</span> | 
+                            <strong>وضعیت ذهنی:</strong> <span class="summary-badge ${stateInfo.badge}">${stateInfo.text}</span>
+                        </div>
+                        <div class="details-grid">
+                            <div class="detail-card">
+                                <div class="detail-card-title">
+                                    <span>ورودی</span>
+                                    <span>${trade.finalChecks.input.checked ? '✔️' : '❌'}</span>
+                                </div>
+                                <div class="detail-card-note">${trade.finalChecks.input.note || 'بدون یادداشت'}</div>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-card-title">
+                                    <span>تفسیر</span>
+                                    <span>${trade.finalChecks.interpretation.checked ? '✔️' : '❌'}</span>
+                                </div>
+                                <div class="detail-card-note">${trade.finalChecks.interpretation.note || 'بدون یادداشت'}</div>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-card-title">
+                                    <span>تصمیم</span>
+                                    <span>${trade.finalChecks.decision.checked ? '✔️' : '❌'}</span>
+                                </div>
+                                <div class="detail-card-note">${trade.finalChecks.decision.note || 'بدون یادداشت'}</div>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-card-title">
+                                    <span>فیدبک</span>
+                                    <span>${trade.finalChecks.feedback.checked ? '✔️' : '❌'}</span>
+                                </div>
+                                <div class="detail-card-note">${trade.finalChecks.feedback.note || 'بدون یادداشت'}</div>
+                            </div>
+                            <div class="detail-card">
+                                <div class="detail-card-title">
+                                    <span>یادگیری</span>
+                                    <span>${trade.finalChecks.learning.checked ? '✔️' : '❌'}</span>
+                                </div>
+                                <div class="detail-card-note">${trade.finalChecks.learning.note || 'بدون یادداشت'}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function renderChecklists() {
+        const tradeContainer = document.getElementById('trade-checklist');
+        const devListContainer = document.getElementById('dev-tasks-list');
+
+        const preTasks = tradeTasks.filter(t => t.category === 'pre');
+        const postTasks = tradeTasks.filter(t => t.category === 'post');
+
+        const renderTradeHTML = (task) => `
+            <div class="task-card ${task.completed ? 'completed' : ''}" onclick="toggleTask('trade', ${task.id})">
+                <button class="status-btn">${task.completed ? '✔️' : '❌'}</button>
+                <div class="task-content">
+                    <span class="task-title">${task.title}</span>
+                    <span class="task-meta">${task.meta}</span>
+                </div>
+            </div>
+        `;
+
+        tradeContainer.innerHTML = `
+            <!-- PHASE 1: BEFORE TRADE -->
+            <div class="phase-block">
+                <div class="phase-title">⏱️ قبل از ترید</div>
+                ${preTasks.map(renderTradeHTML).join('')}
+            </div>
+            
+            <!-- PHASE 2: DURING TRADE -->
+            <div class="phase-block">
+                <div class="phase-title">📊 حین ترید (تامل و مانیتورینگ)</div>
+                
+                <!-- BEFORE ENTRY BOX -->
+                <div class="flow-box">
+                    <div class="flow-box-title">
+                        <span>🔍</span>
+                        <span>قبل از ورود</span>
+                    </div>
+                    
+                    <div class="question-card">
+                        <span class="question-icon">❓</span>
+                        <div class="task-content">
+                            <span class="task-title" style="color: var(--accent-color); font-size: 0.85rem;">واقعیت بازار رو میبینم یا داستان ذهنم؟</span>
+                            <span class="task-meta">دیدن حقیقت عینی بازار بدون دخالت فیلتر امیدها یا ترس‌ها.</span>
+                        </div>
+                    </div>
+
+                    <div class="decision-group">
+                        <div class="decision-title">
+                            <span>🎯</span>
+                            <span>ورود بر اساس چیست؟</span>
+                        </div>
+                        <div class="decision-options">
+                            <button class="opt-btn opt-decision-btn ${selectedDecision === 'data' ? 'selected' : ''}" data-value="data" onclick="selectDecision('data')">داده</button>
+                            <button class="opt-btn opt-decision-btn ${selectedDecision === 'setup' ? 'selected' : ''}" data-value="setup" onclick="selectDecision('setup')">ستاپ</button>
+                            <button class="opt-btn opt-decision-btn ${selectedDecision === 'indecision' ? 'selected-warning' : ''}" data-value="indecision" onclick="selectDecision('indecision')">بی‌تصمیمی</button>
+                        </div>
+                        <div id="warning-msg-box" class="warning-msg" style="display: ${selectedDecision === 'indecision' ? 'block' : 'none'};">
+                            ⚠️ بهتره تصمیمی نگیری :)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5-SECOND PAUSE INTERVAL TIMER -->
+                <div class="interval-timer-card">
+                    <div class="timer-msg">
+                        <span>⏳</span>
+                        <span>قبل از هر تصمیم صبر کن</span>
+                    </div>
+                    <div class="timer-circle-container">
+                        <svg class="timer-svg" width="24" height="24" viewBox="0 0 24 24">
+                            <circle class="timer-bg-circle" cx="12" cy="12" r="10" />
+                            <circle class="timer-fill-circle" cx="12" cy="12" r="10" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- AFTER ENTRY BOX -->
+                <div class="flow-box">
+                    <div class="flow-box-title">
+                        <span>⚡</span>
+                        <span>بعد از ورود</span>
+                    </div>
+                    
+                    <div class="decision-group">
+                        <div class="decision-title">
+                            <span>❓</span>
+                            <span>وضعیتت حین ترید چیه؟</span>
+                        </div>
+                        <div class="decision-options">
+                            <button class="opt-btn opt-state-btn ${selectedState === 'observer' ? 'selected' : ''}" data-value="observer" onclick="selectState('observer')">شاهد و ناظر</button>
+                            <button class="opt-btn opt-state-btn ${selectedState === 'mind' ? 'selected-info' : ''}" data-value="mind" onclick="selectState('mind')">درگیر افکار</button>
+                        </div>
+                        <div id="info-msg-box" class="info-msg" style="display: ${selectedState === 'mind' ? 'block' : 'none'};">
+                            🕊️ میتونی با تنفس عمیق برگردی به لحظه حال.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- PHASE 3: AFTER TRADE -->
+            <div class="phase-block">
+                <div class="phase-title">📓 بعد از ترید</div>
+                ${postTasks.map(renderTradeHTML).join('')}
+                
+                <!-- FINAL CHECKLIST WITH NOTES -->
+                <div class="final-checklist-box">
+                    <div class="flow-box-title">
+                        <span>📝</span>
+                        <span>چک‌لیست و یادداشت نهایی</span>
+                    </div>
+                    
+                    <!-- Item 1: Input -->
+                    <div class="final-item">
+                        <div class="final-header">
+                            <input type="checkbox" id="check-input" class="final-checkbox" ${finalChecks.input.checked ? 'checked' : ''} onchange="handleFinalCheckChange('input', 'checked', this.checked)">
+                            <label for="check-input">ورودی</label>
+                        </div>
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره ورودی..." value="${finalChecks.input.note}" oninput="handleFinalCheckChange('input', 'note', this.value)">
+                    </div>
+
+                    <!-- Item 2: Interpretation -->
+                    <div class="final-item">
+                        <div class="final-header">
+                            <input type="checkbox" id="check-interpretation" class="final-checkbox" ${finalChecks.interpretation.checked ? 'checked' : ''} onchange="handleFinalCheckChange('interpretation', 'checked', this.checked)">
+                            <label for="check-interpretation">تفسیر</label>
+                        </div>
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره تفسیر..." value="${finalChecks.interpretation.note}" oninput="handleFinalCheckChange('interpretation', 'note', this.value)">
+                    </div>
+
+                    <!-- Item 3: Decision -->
+                    <div class="final-item">
+                        <div class="final-header">
+                            <input type="checkbox" id="check-decision" class="final-checkbox" ${finalChecks.decision.checked ? 'checked' : ''} onchange="handleFinalCheckChange('decision', 'checked', this.checked)">
+                            <label for="check-decision">تصمیم</label>
+                        </div>
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره تصمیم..." value="${finalChecks.decision.note}" oninput="handleFinalCheckChange('decision', 'note', this.value)">
+                    </div>
+
+                    <!-- Item 4: Feedback -->
+                    <div class="final-item">
+                        <div class="final-header">
+                            <input type="checkbox" id="check-feedback" class="final-checkbox" ${finalChecks.feedback.checked ? 'checked' : ''} onchange="handleFinalCheckChange('feedback', 'checked', this.checked)">
+                            <label for="check-feedback">فیدبک</label>
+                        </div>
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره فیدبک..." value="${finalChecks.feedback.note}" oninput="handleFinalCheckChange('feedback', 'note', this.value)">
+                    </div>
+
+                    <!-- Item 5: Learning -->
+                    <div class="final-item">
+                        <div class="final-header">
+                            <input type="checkbox" id="check-learning" class="final-checkbox" ${finalChecks.learning.checked ? 'checked' : ''} onchange="handleFinalCheckChange('learning', 'checked', this.checked)">
+                            <label for="check-learning">یادگیری</label>
+                        </div>
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره یادگیری..." value="${finalChecks.learning.note}" oninput="handleFinalCheckChange('learning', 'note', this.value)">
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Dev Tasks Render (Morning & Daily)
+        const morningTasks = devTasks.filter(t => t.category === 'morning');
+        const dailyTasks = devTasks.filter(t => t.category === 'daily');
+
+        const renderDevHTML = (task) => `
+            <div class="task-card ${task.completed ? 'completed' : ''}" onclick="toggleTask('dev', ${task.id})">
+                <button class="status-btn">${task.completed ? '✔️' : '❌'}</button>
+                <div class="task-content">
+                    <span class="task-title">${task.title}</span>
+                    <span class="task-meta">${task.meta}</span>
+                </div>
+            </div>
+        `;
+
+        devListContainer.innerHTML = `
+            <div class="section-title">🌅 تمرینات صبحگاهی</div>
+            ${morningTasks.map(renderDevHTML).join('')}
+            
+            <div class="section-title">🗓️ تمرینات روزانه</div>
+            ${dailyTasks.map(renderDevHTML).join('')}
+        `;
+
+        updateChart();
+        renderSavedTrades();
+    }
+
+    function toggleTask(type, id) {
+        if (type === 'trade') {
+            const task = tradeTasks.find(t => t.id === id);
+            if (task) task.completed = !task.completed;
+        } else {
+            const task = devTasks.find(t => t.id === id);
+            if (task) task.completed = !task.completed;
+        }
+        saveToStorage();
+        renderChecklists();
+    }
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.checklist-container').forEach(c => c.classList.remove('active'));
+
+        const resetBtn = document.getElementById('dynamic-reset-btn');
+
+        if (tab === 'trade') {
+            document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            document.getElementById('trade-checklist').classList.add('active');
+            resetBtn.innerHTML = "🔄 ریست کردن چک‌لیست ترید";
+        } else {
+            document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            document.getElementById('dev-checklist').classList.add('active');
+            resetBtn.innerHTML = "🔄 ریست کردن تمرینات روزانه";
+        }
+    }
+
+    function resetActiveChecklist() {
+        if (activeTab === 'trade') {
+            if (confirm("آیا از ریست کردن چک‌لیست ترید مطمئنید؟ (اطلاعات فعلی در تاریخچه ذخیره خواهد شد)")) {
+                
+                // Formulate current trade record to save
+                const now = new Date();
+                const persianTime = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
+                const persianDate = now.toLocaleDateString('fa-IR');
+                
+                const newTradeRecord = {
+                    id: Date.now(),
+                    timestamp: `${persianTime} - ${persianDate}`,
+                    decision: selectedDecision || 'none',
+                    state: selectedState || 'none',
+                    finalChecks: JSON.parse(JSON.stringify(finalChecks))
+                };
+
+                // Push to historical trades (max 5 items)
+                savedTrades.unshift(newTradeRecord);
+                if (savedTrades.length > 5) {
+                    savedTrades = savedTrades.slice(0, 5);
+                }
+
+                // Reset trade state
+                tradeTasks = JSON.parse(JSON.stringify(defaultTradeTasks));
+                selectedDecision = null;
+                selectedState = null;
+                finalChecks = {
+                    input: { checked: false, note: "" },
+                    interpretation: { checked: false, note: "" },
+                    decision: { checked: false, note: "" },
+                    feedback: { checked: false, note: "" },
+                    learning: { checked: false, note: "" }
+                };
+
+                saveToStorage();
+                renderChecklists();
+            }
+        } else {
+            if (confirm("آیا مطمئن هستید که می‌خواهید تمرینات روزانه را ریست کنید؟")) {
+                devTasks = JSON.parse(JSON.stringify(defaultDevTasks));
+                saveToStorage();
+                renderChecklists();
+            }
+        }
+    }
+
+    renderChecklists();
+</script>
+
+</body>
+</html>
