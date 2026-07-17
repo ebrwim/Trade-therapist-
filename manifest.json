@@ -1,3 +1,10 @@
+{
+  "name": "چک‌لیست ترید تراپیست",
+  "short_name": "ترید تراپیست",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d0f14",
+  "theme_color": "#0f172a",
   "icons": [
     {
       "src": "/Trade-therapist-/icon-192.png",
@@ -10,3 +17,4 @@
       "type": "image/png"
     }
   ]
+}
