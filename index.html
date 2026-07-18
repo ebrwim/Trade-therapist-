@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>چک‌لیست ترید تراپیست</title>
-    <link rel="manifest" href="./manifest.json">
     <style>
         :root {
             --bg-color: #0f172a;
@@ -60,6 +59,42 @@
             font-weight: bold;
         }
 
+        /* استایل‌های بخش ساعت زنده و تاریخ دوگانه */
+        .live-clock-container {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            margin-top: 10px;
+            background-color: rgba(15, 23, 42, 0.4);
+            padding: 6px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+
+        .clock-time-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .clock-date-row {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        #live-time {
+            color: var(--warning-color);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .clock-divider {
+            color: var(--border-color);
+        }
+
         .tabs {
             display: flex;
             gap: 8px;
@@ -94,7 +129,6 @@
             display: block;
         }
 
-        /* Distinct Phase Block Styling for Trade Checklist */
         .phase-block {
             background-color: rgba(15, 23, 42, 0.4);
             border: 1px solid var(--border-color);
@@ -167,7 +201,6 @@
             gap: 6px;
         }
 
-        /* 5-Second Timer Bar Style */
         .interval-timer-card {
             background-color: #0f172a;
             border: 1px solid var(--border-color);
@@ -340,7 +373,6 @@
             animation: fadeIn 0.2s ease-out;
         }
 
-        /* Final Checklist Styling */
         .final-checklist-box {
             background-color: #0f172a;
             border: 1px solid var(--border-color);
@@ -417,7 +449,34 @@
             box-shadow: 0 0 4px rgba(6, 182, 212, 0.2);
         }
 
-        /* Saved Trades Section */
+        .trader-notes-box {
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .trader-textarea {
+            width: 100%;
+            height: 80px;
+            background-color: #1e293b;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 0.8rem;
+            outline: none;
+            resize: none;
+            transition: all 0.2s;
+            line-height: 1.5;
+        }
+
+        .trader-textarea:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 4px rgba(6, 182, 212, 0.2);
+        }
+
         .history-section {
             background-color: rgba(15, 23, 42, 0.6);
             border: 1px dashed var(--border-color);
@@ -529,6 +588,16 @@
             font-style: italic;
         }
 
+        .history-trader-note-box {
+            background-color: rgba(245, 158, 11, 0.05);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 6px;
+            padding: 8px;
+            margin-top: 8px;
+            color: #fef08a;
+            white-space: pre-wrap;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-5px); }
             to { opacity: 1; transform: translateY(0); }
@@ -547,7 +616,6 @@
             height: 32px;
         }
 
-        /* Completed Task Style */
         .task-card.completed {
             border-color: #059669;
             opacity: 0.85;
@@ -562,7 +630,6 @@
             color: #059669;
         }
 
-        /* Chart Section Style */
         .chart-box {
             background-color: #0f172a;
             border: 1px solid var(--border-color);
@@ -675,6 +742,17 @@
 <div class="app-container">
     <header>
         <h1>چک‌لیست ترید تراپیست</h1>
+        <!-- ساختار هدر تغییر یافته برای گنجاندن هر دو تاریخ -->
+        <div class="live-clock-container">
+            <div class="clock-time-row">
+                <span id="live-time">۰۰:۰۰:۰۰</span>
+                <span class="clock-divider">|</span>
+                <span id="live-date">امروز</span>
+            </div>
+            <div class="clock-date-row" id="live-gregorian-date">
+                Gregorian Date
+            </div>
+        </div>
     </header>
 
     <div class="tabs">
@@ -688,7 +766,6 @@
     <!-- Development Checklist -->
     <div id="dev-checklist" class="checklist-container">
         <div id="dev-tasks-list"></div>
-        <!-- Dynamic Pie/Donut Chart Area -->
         <div class="chart-box">
             <div class="chart-visual">
                 <svg class="chart-svg" width="100" height="100" viewBox="0 0 100 100">
@@ -710,7 +787,7 @@
         </div>
     </div>
 
-    <!-- 5 Last Trades History Section (Fixed at bottom of both checklists) -->
+    <!-- 5 Last Trades History Section -->
     <div class="history-section">
         <div class="history-title">📊 ۵ معامله آخر (تاریخچه)</div>
         <div id="history-container" class="history-list"></div>
@@ -723,27 +800,20 @@
 </div>
 
 <script>
-    // datasets
     const defaultTradeTasks = [
-        // Pre-trade tasks
         { id: 1, title: "مدیتیشن و تمرکز ذهنی", meta: "آرامش درونی و حضور صد درصدی در لحظه حال", category: "pre", completed: false },
         { id: 17, title: "مرور یک باور ثروت و موفقیت", meta: "همراستا کردن ذهن با فرکانس فراوانی و لیاقت", category: "pre", completed: false },
         { id: 18, title: "ثبت وضعیت درونی (ذهن، احساس و بدن)", meta: "اسکن خودکار؛ آیا در صلح هستم یا تحت فشار تنش فیزیکی؟", category: "pre", completed: false },
         { id: 19, title: "ارزیابی بازار امروز (واضح یا مبهم؟)", meta: "تشخیص میزان شفافیت ساختار چارت قبل از لمس دکمه معامله", category: "pre", completed: false },
-        
-        // Post-trade tasks
         { id: 8, title: "ثبت دقیق معامله همراه با دلیل روانشناختی در ژورنال", meta: "ژورنال‌نویسی", category: "post", completed: false }
     ];
 
     const defaultDevTasks = [
-        // Morning Category
         { id: 9, title: "بیدار شدن ساعت ۵ صبح", meta: "تمرینات صبحگاهی", category: "morning", completed: false },
         { id: 10, title: "لبخند زدن", meta: "تمرینات صبحگاهی", category: "morning", completed: false },
         { id: 13, title: "مدیتیشن", meta: "تمرینات صبحگاهی", category: "morning", completed: false },
         { id: 11, title: "۲ صفحه نوشتن", meta: "خودکاوی و مکتوب کردن ذهن", category: "morning", completed: false },
         { id: 12, title: "ارسال ویس باور", meta: "تثبیت کدهای روانشناختی", category: "morning", completed: false },
-        
-        // Daily Category
         { id: 14, title: "ورزش", meta: "تمرینات روزانه", category: "daily", completed: false },
         { id: 15, title: "مطالعه کتاب", meta: "تمرینات روزانه", category: "daily", completed: false },
         { id: 16, title: "خلوت با خود", meta: "تمرینات روزانه", category: "daily", completed: false }
@@ -751,14 +821,13 @@
 
     let activeTab = 'trade';
 
-    // Storage version updated to v18 for clean integration of 5 last trades
     let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v18')) || defaultTradeTasks;
     let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v18')) || defaultDevTasks;
     let selectedDecision = localStorage.getItem('selected_decision_v18') || null;
     let selectedState = localStorage.getItem('selected_state_v18') || null;
     let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v18')) || [];
+    let traderFreeNotes = localStorage.getItem('trader_free_notes_v18') || "";
 
-    // Final Checklist States
     let finalChecks = JSON.parse(localStorage.getItem('final_checks_v18')) || {
         input: { checked: false, note: "" },
         interpretation: { checked: false, note: "" },
@@ -772,6 +841,7 @@
         localStorage.setItem('dev_tasks_v18', JSON.stringify(devTasks));
         localStorage.setItem('final_checks_v18', JSON.stringify(finalChecks));
         localStorage.setItem('saved_trades_v18', JSON.stringify(savedTrades));
+        localStorage.setItem('trader_free_notes_v18', traderFreeNotes);
         if (selectedDecision) {
             localStorage.setItem('selected_decision_v18', selectedDecision);
         } else {
@@ -856,6 +926,11 @@
         saveToStorage();
     }
 
+    function handleFreeNotesChange(value) {
+        traderFreeNotes = value;
+        saveToStorage();
+    }
+
     function toggleHistoryItem(index) {
         const item = document.getElementById(`history-item-${index}`);
         if (item) {
@@ -886,6 +961,12 @@
         container.innerHTML = savedTrades.map((trade, index) => {
             const decInfo = translateDecision(trade.decision);
             const stateInfo = translateState(trade.state);
+
+            const notesHTML = trade.freeNotes ? `
+                <div class="history-trader-note-box">
+                    <strong>📝 یادداشت تریدر:</strong><br>${trade.freeNotes}
+                </div>
+            ` : '';
 
             return `
                 <div class="history-item" id="history-item-${index}">
@@ -937,6 +1018,7 @@
                                 <div class="detail-card-note">${trade.finalChecks.learning.note || 'بدون یادداشت'}</div>
                             </div>
                         </div>
+                        ${notesHTML}
                     </div>
                 </div>
             `;
@@ -961,17 +1043,14 @@
         `;
 
         tradeContainer.innerHTML = `
-            <!-- PHASE 1: BEFORE TRADE -->
             <div class="phase-block">
                 <div class="phase-title">⏱️ قبل از ترید</div>
                 ${preTasks.map(renderTradeHTML).join('')}
             </div>
             
-            <!-- PHASE 2: DURING TRADE -->
             <div class="phase-block">
                 <div class="phase-title">📊 حین ترید (تامل و مانیتورینگ)</div>
                 
-                <!-- BEFORE ENTRY BOX -->
                 <div class="flow-box">
                     <div class="flow-box-title">
                         <span>🔍</span>
@@ -1002,7 +1081,6 @@
                     </div>
                 </div>
 
-                <!-- 5-SECOND PAUSE INTERVAL TIMER -->
                 <div class="interval-timer-card">
                     <div class="timer-msg">
                         <span>⏳</span>
@@ -1016,7 +1094,6 @@
                     </div>
                 </div>
 
-                <!-- AFTER ENTRY BOX -->
                 <div class="flow-box">
                     <div class="flow-box-title">
                         <span>⚡</span>
@@ -1039,19 +1116,16 @@
                 </div>
             </div>
             
-            <!-- PHASE 3: AFTER TRADE -->
             <div class="phase-block">
                 <div class="phase-title">📓 بعد از ترید</div>
                 ${postTasks.map(renderTradeHTML).join('')}
                 
-                <!-- FINAL CHECKLIST WITH NOTES -->
                 <div class="final-checklist-box">
                     <div class="flow-box-title">
                         <span>📝</span>
                         <span>چک‌لیست و یادداشت نهایی</span>
                     </div>
                     
-                    <!-- Item 1: Input -->
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-input" class="final-checkbox" ${finalChecks.input.checked ? 'checked' : ''} onchange="handleFinalCheckChange('input', 'checked', this.checked)">
@@ -1060,7 +1134,6 @@
                         <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره ورودی..." value="${finalChecks.input.note}" oninput="handleFinalCheckChange('input', 'note', this.value)">
                     </div>
 
-                    <!-- Item 2: Interpretation -->
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-interpretation" class="final-checkbox" ${finalChecks.interpretation.checked ? 'checked' : ''} onchange="handleFinalCheckChange('interpretation', 'checked', this.checked)">
@@ -1069,7 +1142,6 @@
                         <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره تفسیر..." value="${finalChecks.interpretation.note}" oninput="handleFinalCheckChange('interpretation', 'note', this.value)">
                     </div>
 
-                    <!-- Item 3: Decision -->
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-decision" class="final-checkbox" ${finalChecks.decision.checked ? 'checked' : ''} onchange="handleFinalCheckChange('decision', 'checked', this.checked)">
@@ -1078,7 +1150,6 @@
                         <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره تصمیم..." value="${finalChecks.decision.note}" oninput="handleFinalCheckChange('decision', 'note', this.value)">
                     </div>
 
-                    <!-- Item 4: Feedback -->
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-feedback" class="final-checkbox" ${finalChecks.feedback.checked ? 'checked' : ''} onchange="handleFinalCheckChange('feedback', 'checked', this.checked)">
@@ -1087,7 +1158,6 @@
                         <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره فیدبک..." value="${finalChecks.feedback.note}" oninput="handleFinalCheckChange('feedback', 'note', this.value)">
                     </div>
 
-                    <!-- Item 5: Learning -->
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-learning" class="final-checkbox" ${finalChecks.learning.checked ? 'checked' : ''} onchange="handleFinalCheckChange('learning', 'checked', this.checked)">
@@ -1096,10 +1166,17 @@
                         <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره یادگیری..." value="${finalChecks.learning.note}" oninput="handleFinalCheckChange('learning', 'note', this.value)">
                     </div>
                 </div>
+
+                <div class="trader-notes-box">
+                    <div class="flow-box-title">
+                        <span>💭</span>
+                        <span>یادداشت و توضیحات تریدر</span>
+                    </div>
+                    <textarea class="trader-textarea" placeholder="توضیحات مربوط به ژورنال، روانشناسی، وضعیت مارکت یا مدیریت سرمایه را اینجا بنویسید..." oninput="handleFreeNotesChange(this.value)">${traderFreeNotes}</textarea>
+                </div>
             </div>
         `;
 
-        // Dev Tasks Render (Morning & Daily)
         const morningTasks = devTasks.filter(t => t.category === 'morning');
         const dailyTasks = devTasks.filter(t => t.category === 'daily');
 
@@ -1159,7 +1236,6 @@
         if (activeTab === 'trade') {
             if (confirm("آیا از ریست کردن چک‌لیست ترید مطمئنید؟ (اطلاعات فعلی در تاریخچه ذخیره خواهد شد)")) {
                 
-                // Formulate current trade record to save
                 const now = new Date();
                 const persianTime = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
                 const persianDate = now.toLocaleDateString('fa-IR');
@@ -1169,19 +1245,19 @@
                     timestamp: `${persianTime} - ${persianDate}`,
                     decision: selectedDecision || 'none',
                     state: selectedState || 'none',
-                    finalChecks: JSON.parse(JSON.stringify(finalChecks))
+                    finalChecks: JSON.parse(JSON.stringify(finalChecks)),
+                    freeNotes: traderFreeNotes
                 };
 
-                // Push to historical trades (max 5 items)
                 savedTrades.unshift(newTradeRecord);
                 if (savedTrades.length > 5) {
                     savedTrades = savedTrades.slice(0, 5);
                 }
 
-                // Reset trade state
                 tradeTasks = JSON.parse(JSON.stringify(defaultTradeTasks));
                 selectedDecision = null;
                 selectedState = null;
+                traderFreeNotes = "";
                 finalChecks = {
                     input: { checked: false, note: "" },
                     interpretation: { checked: false, note: "" },
@@ -1202,6 +1278,41 @@
         }
     }
 
+    // تابع به‌روزرسانی زنده ساعت، تاریخ شمسی و تاریخ میلادی
+    function updateLiveClock() {
+        const now = new Date();
+        
+        // فرمت ساعت زنده (فارسی)
+        const timeString = now.toLocaleTimeString('fa-IR', { 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        });
+        
+        // فرمت تاریخ شمسی
+        const dateString = now.toLocaleDateString('fa-IR', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // فرمت تاریخ میلادی (مثال: Friday, July 17, 2026)
+        const gregorianString = now.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+
+        document.getElementById('live-time').innerText = timeString;
+        document.getElementById('live-date').innerText = dateString;
+        document.getElementById('live-gregorian-date').innerText = gregorianString;
+    }
+
+    // اجرای برنامه
+    updateLiveClock();
+    setInterval(updateLiveClock, 1000);
     renderChecklists();
 </script>
 
