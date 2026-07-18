@@ -59,7 +59,6 @@
             font-weight: bold;
         }
 
-        /* استایل‌های بخش ساعت زنده و تاریخ دوگانه */
         .live-clock-container {
             display: inline-flex;
             flex-direction: column;
@@ -93,6 +92,90 @@
 
         .clock-divider {
             color: var(--border-color);
+        }
+
+        /* استایل بخش جدید باور روزانه */
+        .daily-belief-section {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.05));
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .belief-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .belief-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .belief-input {
+            flex: 1;
+            background-color: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .belief-input:focus {
+            border-color: var(--accent-color);
+        }
+
+        .belief-btn {
+            background-color: var(--accent-color);
+            color: #0f172a;
+            border: none;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .belief-btn:hover {
+            opacity: 0.9;
+        }
+
+        .belief-display-box {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px dashed rgba(6, 182, 212, 0.4);
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #e2e8f0;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .clear-belief-btn {
+            position: absolute;
+            left: 6px;
+            top: 6px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .clear-belief-btn:hover {
+            color: var(--danger-color);
         }
 
         .tabs {
@@ -742,7 +825,6 @@
 <div class="app-container">
     <header>
         <h1>چک‌لیست ترید تراپیست</h1>
-        <!-- ساختار هدر تغییر یافته برای گنجاندن هر دو تاریخ -->
         <div class="live-clock-container">
             <div class="clock-time-row">
                 <span id="live-time">۰۰:۰۰:۰۰</span>
@@ -754,6 +836,19 @@
             </div>
         </div>
     </header>
+
+    <!-- بخش جدید: کُد یا باور روانشناختی روزانه -->
+    <div class="daily-belief-section">
+        <div class="belief-title">🧠 کد و باور روانشناختی امروز من:</div>
+        <div id="belief-input-zone" class="belief-input-group">
+            <input type="text" id="belief-input" class="belief-input" placeholder="باور یا قانون امروزت رو بنویس...">
+            <button class="belief-btn" onclick="saveDailyBelief()">ثبت باور</button>
+        </div>
+        <div id="belief-display-zone" class="belief-display-box" style="display: none;">
+            <span id="belief-text"></span>
+            <button class="clear-belief-btn" onclick="clearDailyBelief()">❌</button>
+        </div>
+    </div>
 
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('trade')">چک‌لیست ترید</button>
@@ -828,6 +923,10 @@
     let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v18')) || [];
     let traderFreeNotes = localStorage.getItem('trader_free_notes_v18') || "";
 
+    // متغیرهای جدید باور روانشناختی
+    let dailyBelief = localStorage.getItem('daily_belief_v18') || "";
+    let lastSavedDate = localStorage.getItem('belief_saved_date_v18') || "";
+
     let finalChecks = JSON.parse(localStorage.getItem('final_checks_v18')) || {
         input: { checked: false, note: "" },
         interpretation: { checked: false, note: "" },
@@ -842,6 +941,8 @@
         localStorage.setItem('final_checks_v18', JSON.stringify(finalChecks));
         localStorage.setItem('saved_trades_v18', JSON.stringify(savedTrades));
         localStorage.setItem('trader_free_notes_v18', traderFreeNotes);
+        localStorage.setItem('daily_belief_v18', dailyBelief);
+        localStorage.setItem('belief_saved_date_v18', lastSavedDate);
         if (selectedDecision) {
             localStorage.setItem('selected_decision_v18', selectedDecision);
         } else {
@@ -851,6 +952,52 @@
             localStorage.setItem('selected_state_v18', selectedState);
         } else {
             localStorage.removeItem('selected_state_v18');
+        }
+    }
+
+    // توابع جدید مدیریت باور روزانه
+    function checkAndResetDailyBelief() {
+        const todayStr = new Date().toLocaleDateString('en-US'); // تاریخ ثابت میلادی مبنای سوئیچ روز
+        if (lastSavedDate && lastSavedDate !== todayStr) {
+            dailyBelief = "";
+            lastSavedDate = "";
+            saveToStorage();
+        }
+        renderDailyBelief();
+    }
+
+    function saveDailyBelief() {
+        const inputEl = document.getElementById('belief-input');
+        const val = inputEl.value.trim();
+        if(val) {
+            dailyBelief = val;
+            lastSavedDate = new Date().toLocaleDateString('en-US');
+            saveToStorage();
+            renderDailyBelief();
+            inputEl.value = "";
+        }
+    }
+
+    function clearDailyBelief() {
+        dailyBelief = "";
+        lastSavedDate = "";
+        saveToStorage();
+        renderDailyBelief();
+    }
+
+    function renderDailyBelief() {
+        const inputZone = document.getElementById('belief-input-zone');
+        const displayZone = document.getElementById('belief-display-zone');
+        const textEl = document.getElementById('belief-text');
+
+        if(dailyBelief) {
+            inputZone.style.display = 'none';
+            displayZone.style.display = 'block';
+            textEl.innerText = dailyBelief;
+        } else {
+            inputZone.style.display = 'flex';
+            displayZone.style.display = 'none';
+            textEl.innerText = "";
         }
     }
 
@@ -1278,18 +1425,15 @@
         }
     }
 
-    // تابع به‌روزرسانی زنده ساعت، تاریخ شمسی و تاریخ میلادی
     function updateLiveClock() {
         const now = new Date();
         
-        // فرمت ساعت زنده (فارسی)
         const timeString = now.toLocaleTimeString('fa-IR', { 
             hour: '2-digit', 
             minute: '2-digit', 
             second: '2-digit' 
         });
         
-        // فرمت تاریخ شمسی
         const dateString = now.toLocaleDateString('fa-IR', { 
             weekday: 'long', 
             year: 'numeric', 
@@ -1297,7 +1441,6 @@
             day: 'numeric' 
         });
 
-        // فرمت تاریخ میلادی (مثال: Friday, July 17, 2026)
         const gregorianString = now.toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',
@@ -1308,9 +1451,12 @@
         document.getElementById('live-time').innerText = timeString;
         document.getElementById('live-date').innerText = dateString;
         document.getElementById('live-gregorian-date').innerText = gregorianString;
+
+        // چک کردن مداوم تغییر تاریخ جهت ریست خودکار باور
+        checkAndResetDailyBelief();
     }
 
-    // اجرای برنامه
+    // لود اولیه و تنظیم اینتروال
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
     renderChecklists();
