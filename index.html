@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>چک‌لیست ترید تراپیست</title>
+    
+    <!-- 🟢 خطوط اتصال به فایل مانیفست و آیکون‌ها برای نصب برنامه -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#06b6d4">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <style>
         :root {
             --bg-color: #0f172a;
@@ -88,13 +96,13 @@
         #live-time {
             color: var(--warning-color);
             font-variant-numeric: tabular-nums;
+            font-family: 'Courier New', Courier, monospace, 'Segoe UI';
         }
 
         .clock-divider {
             color: var(--border-color);
         }
 
-        /* استایل بخش جدید باور روزانه */
         .daily-belief-section {
             background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.05));
             border: 1px solid rgba(6, 182, 212, 0.3);
@@ -837,7 +845,6 @@
         </div>
     </header>
 
-    <!-- بخش جدید: کُد یا باور روانشناختی روزانه -->
     <div class="daily-belief-section">
         <div class="belief-title">🧠 کد و باور روانشناختی امروز من:</div>
         <div id="belief-input-zone" class="belief-input-group">
@@ -846,7 +853,7 @@
         </div>
         <div id="belief-display-zone" class="belief-display-box" style="display: none;">
             <span id="belief-text"></span>
-            <button class="clear-belief-btn" onclick="clearDailyBelief()">❌</button>
+            <button class="clear-belief-btn" onclick="clearDailyBelief(event)">❌</button>
         </div>
     </div>
 
@@ -895,6 +902,13 @@
 </div>
 
 <script>
+    // 🟢 ثبت سرویس ورکر برای فعال شدن قابلیت نصب آفلاین
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('سرویس ورکر با موفقیت ثبت شد.'))
+            .catch(err => console.log('خطا در ثبت سرویس ورکر:', err));
+    }
+
     const defaultTradeTasks = [
         { id: 1, title: "مدیتیشن و تمرکز ذهنی", meta: "آرامش درونی و حضور صد درصدی در لحظه حال", category: "pre", completed: false },
         { id: 17, title: "مرور یک باور ثروت و موفقیت", meta: "همراستا کردن ذهن با فرکانس فراوانی و لیاقت", category: "pre", completed: false },
@@ -923,7 +937,6 @@
     let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v18')) || [];
     let traderFreeNotes = localStorage.getItem('trader_free_notes_v18') || "";
 
-    // متغیرهای جدید باور روانشناختی
     let dailyBelief = localStorage.getItem('daily_belief_v18') || "";
     let lastSavedDate = localStorage.getItem('belief_saved_date_v18') || "";
 
@@ -955,9 +968,8 @@
         }
     }
 
-    // توابع جدید مدیریت باور روزانه
     function checkAndResetDailyBelief() {
-        const todayStr = new Date().toLocaleDateString('en-US'); // تاریخ ثابت میلادی مبنای سوئیچ روز
+        const todayStr = new Date().toLocaleDateString('en-US'); 
         if (lastSavedDate && lastSavedDate !== todayStr) {
             dailyBelief = "";
             lastSavedDate = "";
@@ -978,7 +990,8 @@
         }
     }
 
-    function clearDailyBelief() {
+    function clearDailyBelief(event) {
+        if(event) event.stopPropagation(); 
         dailyBelief = "";
         lastSavedDate = "";
         saveToStorage();
@@ -1452,11 +1465,9 @@
         document.getElementById('live-date').innerText = dateString;
         document.getElementById('live-gregorian-date').innerText = gregorianString;
 
-        // چک کردن مداوم تغییر تاریخ جهت ریست خودکار باور
         checkAndResetDailyBelief();
     }
 
-    // لود اولیه و تنظیم اینتروال
     updateLiveClock();
     setInterval(updateLiveClock, 1000);
     renderChecklists();
