@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>چک‌لیست ترید تراپیست</title>
     
-    <!-- 🟢 خطوط اتصال به فایل مانیفست و آیکون‌ها برای نصب برنامه -->
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#06b6d4">
+    <meta name="theme-color" content="#0f172a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -42,6 +41,7 @@
             align-items: flex-start;
             min-height: 100vh;
             padding: 12px;
+            position: relative;
         }
 
         .app-container {
@@ -52,6 +52,38 @@
             padding: 16px;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        /* --- Music Button --- */
+        .music-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            transition: all 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .music-btn.playing {
+            background-color: rgba(6, 182, 212, 0.2);
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         header {
@@ -186,6 +218,26 @@
             color: var(--danger-color);
         }
 
+        /* --- Oracle Button --- */
+        .oracle-btn {
+            background-color: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            color: #c4b5fd;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-top: 10px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .oracle-btn:hover {
+            background-color: rgba(139, 92, 246, 0.2);
+            border-color: #8b5cf6;
+            color: #fff;
+        }
+
         .tabs {
             display: flex;
             gap: 8px;
@@ -240,6 +292,38 @@
             gap: 6px;
         }
 
+        /* --- Box Breathing Animation --- */
+        .breathing-box {
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--info-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 12px;
+            text-align: center;
+            display: none;
+        }
+        .breath-circle {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--info-color) 0%, transparent 80%);
+            border-radius: 50%;
+            margin: 10px auto;
+            opacity: 0.8;
+            animation: breathe 16s infinite linear;
+        }
+        .breath-text {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #93c5fd;
+            margin-top: 10px;
+        }
+        @keyframes breathe {
+            0%, 100% { transform: scale(0.6); opacity: 0.5; }
+            25% { transform: scale(1.6); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 1; }
+            75% { transform: scale(0.6); opacity: 0.5; }
+        }
+
         .section-title {
             font-size: 0.85rem;
             color: var(--accent-color);
@@ -274,10 +358,6 @@
             border-radius: 10px;
             padding: 12px;
             margin-bottom: 10px;
-        }
-
-        .flow-box:last-child {
-            margin-bottom: 0;
         }
 
         .flow-box-title {
@@ -464,7 +544,27 @@
             animation: fadeIn 0.2s ease-out;
         }
 
-        .final-checklist-box {
+        /* --- Jump to Breathing Button --- */
+        .jump-to-breath-btn {
+            display: block;
+            margin: 8px auto 0;
+            padding: 6px 12px;
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            border: 1px solid var(--info-color);
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .jump-to-breath-btn:hover {
+            background-color: var(--info-color);
+            color: #fff;
+        }
+
+        .final-checklist-box, .trader-notes-box {
             background-color: #0f172a;
             border: 1px solid var(--border-color);
             border-radius: 10px;
@@ -472,13 +572,8 @@
             margin-top: 12px;
         }
 
-        .final-item {
-            margin-bottom: 10px;
-        }
-
-        .final-item:last-child {
-            margin-bottom: 0;
-        }
+        .final-item { margin-bottom: 10px; }
+        .final-item:last-child { margin-bottom: 0; }
 
         .final-header {
             display: flex;
@@ -488,10 +583,6 @@
             font-weight: bold;
             color: var(--text-color);
             margin-bottom: 4px;
-        }
-
-        .final-header label {
-            cursor: pointer;
         }
 
         .final-checkbox {
@@ -522,7 +613,8 @@
         }
 
         .final-input {
-            width: 100%;
+            width: calc(100% - 24px);
+            margin-right: 24px;
             background-color: #1e293b;
             border: 1px solid var(--border-color);
             color: var(--text-color);
@@ -531,21 +623,11 @@
             font-size: 0.75rem;
             outline: none;
             transition: all 0.2s;
-            margin-right: 24px;
-            width: calc(100% - 24px);
         }
 
-        .final-input:focus {
+        .final-input:focus, .trader-textarea:focus {
             border-color: var(--accent-color);
             box-shadow: 0 0 4px rgba(6, 182, 212, 0.2);
-        }
-
-        .trader-notes-box {
-            background-color: #0f172a;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            margin-top: 12px;
         }
 
         .trader-textarea {
@@ -561,11 +643,6 @@
             resize: none;
             transition: all 0.2s;
             line-height: 1.5;
-        }
-
-        .trader-textarea:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 4px rgba(6, 182, 212, 0.2);
         }
 
         .history-section {
@@ -586,11 +663,7 @@
             gap: 6px;
         }
 
-        .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
+        .history-list { display: flex; flex-direction: column; gap: 8px; }
 
         .history-item {
             background-color: var(--card-bg);
@@ -610,19 +683,9 @@
             font-weight: bold;
         }
 
-        .history-header:hover {
-            background-color: rgba(255, 255, 255, 0.03);
-        }
-
-        .history-arrow {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            transition: transform 0.2s;
-        }
-
-        .history-item.open .history-arrow {
-            transform: rotate(180deg);
-        }
+        .history-header:hover { background-color: rgba(255, 255, 255, 0.03); }
+        .history-arrow { font-size: 0.75rem; color: var(--text-muted); transition: transform 0.2s; }
+        .history-item.open .history-arrow { transform: rotate(180deg); }
 
         .history-details {
             display: none;
@@ -632,10 +695,7 @@
             font-size: 0.75rem;
             line-height: 1.6;
         }
-
-        .history-item.open .history-details {
-            display: block;
-        }
+        .history-item.open .history-details { display: block; }
 
         .summary-badge {
             display: inline-block;
@@ -652,32 +712,15 @@
         .badge-observer { background-color: rgba(16, 185, 129, 0.2); color: var(--success-color); }
         .badge-mind { background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; }
 
-        .details-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
+        .details-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 8px; }
         .detail-card {
             background-color: var(--card-bg);
             padding: 8px;
             border-radius: 6px;
             border: 1px solid var(--border-color);
         }
-
-        .detail-card-title {
-            font-weight: bold;
-            color: var(--accent-color);
-            margin-bottom: 4px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .detail-card-note {
-            color: var(--text-muted);
-            font-style: italic;
-        }
+        .detail-card-title { font-weight: bold; color: var(--accent-color); margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .detail-card-note { color: var(--text-muted); font-style: italic; }
 
         .history-trader-note-box {
             background-color: rgba(245, 158, 11, 0.05);
@@ -689,10 +732,7 @@
             white-space: pre-wrap;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         .status-btn {
             background: none;
@@ -707,19 +747,9 @@
             height: 32px;
         }
 
-        .task-card.completed {
-            border-color: #059669;
-            opacity: 0.85;
-        }
-
-        .task-card.completed .task-title {
-            color: var(--text-muted);
-            text-decoration: line-through;
-        }
-
-        .task-card.completed .task-meta {
-            color: #059669;
-        }
+        .task-card.completed { border-color: #059669; opacity: 0.85; }
+        .task-card.completed .task-title { color: var(--text-muted); text-decoration: line-through; }
+        .task-card.completed .task-meta { color: #059669; }
 
         .chart-box {
             background-color: #0f172a;
@@ -732,22 +762,9 @@
             justify-content: space-around;
         }
 
-        .chart-visual {
-            position: relative;
-            width: 100px;
-            height: 100px;
-        }
-
-        .chart-svg {
-            transform: rotate(-90deg);
-        }
-
-        .chart-bg-circle {
-            fill: none;
-            stroke: #1e293b;
-            stroke-width: 8;
-        }
-
+        .chart-visual { position: relative; width: 100px; height: 100px; }
+        .chart-svg { transform: rotate(-90deg); }
+        .chart-bg-circle { fill: none; stroke: #1e293b; stroke-width: 8; }
         .chart-fill-circle {
             fill: none;
             stroke: var(--success-color);
@@ -760,44 +777,15 @@
 
         .chart-percentage {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--success-color);
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; font-weight: bold; color: var(--success-color);
         }
 
-        .chart-info {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .chart-info-item {
-            font-size: 0.8rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .dot-done {
-            width: 10px;
-            height: 10px;
-            background-color: var(--success-color);
-            border-radius: 50%;
-        }
-
-        .dot-todo {
-            width: 10px;
-            height: 10px;
-            background-color: var(--danger-color);
-            border-radius: 50%;
-        }
+        .chart-info { display: flex; flex-direction: column; gap: 6px; }
+        .chart-info-item { font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+        .dot-done { width: 10px; height: 10px; background-color: var(--success-color); border-radius: 50%; }
+        .dot-todo { width: 10px; height: 10px; background-color: var(--danger-color); border-radius: 50%; }
 
         footer {
             margin-top: 20px;
@@ -821,16 +809,19 @@
             font-weight: bold;
             transition: all 0.2s;
         }
+        .reset-btn:hover { background-color: rgba(239, 68, 68, 0.1); border-color: var(--danger-color); }
 
-        .reset-btn:hover {
-            background-color: rgba(239, 68, 68, 0.1);
-            border-color: var(--danger-color);
-        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
+    <!-- Music Button -->
+    <button id="music-toggle" class="music-btn" onclick="toggleMusic()" title="موسیقی تمرکز">🎧</button>
+    <audio id="bg-audio" loop>
+        <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
+    </audio>
+
     <header>
         <h1>چک‌لیست ترید تراپیست</h1>
         <div class="live-clock-container">
@@ -855,6 +846,8 @@
             <span id="belief-text"></span>
             <button class="clear-belief-btn" onclick="clearDailyBelief(event)">❌</button>
         </div>
+        
+        <button class="oracle-btn" onclick="generateWisdom()">🔮 دریافت یک بینش عمیق</button>
     </div>
 
     <div class="tabs">
@@ -889,7 +882,7 @@
         </div>
     </div>
 
-    <!-- 5 Last Trades History Section -->
+    <!-- History Section -->
     <div class="history-section">
         <div class="history-title">📊 ۵ معامله آخر (تاریخچه)</div>
         <div id="history-container" class="history-list"></div>
@@ -902,7 +895,6 @@
 </div>
 
 <script>
-    // 🟢 ثبت سرویس ورکر برای فعال شدن قابلیت نصب آفلاین
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
             .then(() => console.log('سرویس ورکر با موفقیت ثبت شد.'))
@@ -930,17 +922,17 @@
 
     let activeTab = 'trade';
 
-    let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v18')) || defaultTradeTasks;
-    let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v18')) || defaultDevTasks;
-    let selectedDecision = localStorage.getItem('selected_decision_v18') || null;
-    let selectedState = localStorage.getItem('selected_state_v18') || null;
-    let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v18')) || [];
-    let traderFreeNotes = localStorage.getItem('trader_free_notes_v18') || "";
+    let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v20')) || defaultTradeTasks;
+    let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v20')) || defaultDevTasks;
+    let selectedDecision = localStorage.getItem('selected_decision_v20') || null;
+    let selectedState = localStorage.getItem('selected_state_v20') || null;
+    let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v20')) || [];
+    let traderFreeNotes = localStorage.getItem('trader_free_notes_v20') || "";
 
-    let dailyBelief = localStorage.getItem('daily_belief_v18') || "";
-    let lastSavedDate = localStorage.getItem('belief_saved_date_v18') || "";
+    let dailyBelief = localStorage.getItem('daily_belief_v20') || "";
+    let lastSavedDate = localStorage.getItem('belief_saved_date_v20') || "";
 
-    let finalChecks = JSON.parse(localStorage.getItem('final_checks_v18')) || {
+    let finalChecks = JSON.parse(localStorage.getItem('final_checks_v20')) || {
         input: { checked: false, note: "" },
         interpretation: { checked: false, note: "" },
         decision: { checked: false, note: "" },
@@ -949,23 +941,97 @@
     };
 
     function saveToStorage() {
-        localStorage.setItem('trade_tasks_v18', JSON.stringify(tradeTasks));
-        localStorage.setItem('dev_tasks_v18', JSON.stringify(devTasks));
-        localStorage.setItem('final_checks_v18', JSON.stringify(finalChecks));
-        localStorage.setItem('saved_trades_v18', JSON.stringify(savedTrades));
-        localStorage.setItem('trader_free_notes_v18', traderFreeNotes);
-        localStorage.setItem('daily_belief_v18', dailyBelief);
-        localStorage.setItem('belief_saved_date_v18', lastSavedDate);
-        if (selectedDecision) {
-            localStorage.setItem('selected_decision_v18', selectedDecision);
+        localStorage.setItem('trade_tasks_v20', JSON.stringify(tradeTasks));
+        localStorage.setItem('dev_tasks_v20', JSON.stringify(devTasks));
+        localStorage.setItem('final_checks_v20', JSON.stringify(finalChecks));
+        localStorage.setItem('saved_trades_v20', JSON.stringify(savedTrades));
+        localStorage.setItem('trader_free_notes_v20', traderFreeNotes);
+        localStorage.setItem('daily_belief_v20', dailyBelief);
+        localStorage.setItem('belief_saved_date_v20', lastSavedDate);
+        if (selectedDecision) localStorage.setItem('selected_decision_v20', selectedDecision);
+        else localStorage.removeItem('selected_decision_v20');
+        if (selectedState) localStorage.setItem('selected_state_v20', selectedState);
+        else localStorage.removeItem('selected_state_v20');
+    }
+
+    // --- Music Logic ---
+    const bgAudio = document.getElementById('bg-audio');
+    const musicBtn = document.getElementById('music-toggle');
+    bgAudio.volume = 0.3; 
+
+    function toggleMusic() {
+        if (bgAudio.paused) {
+            bgAudio.play();
+            musicBtn.classList.add('playing');
         } else {
-            localStorage.removeItem('selected_decision_v18');
+            bgAudio.pause();
+            musicBtn.classList.remove('playing');
         }
-        if (selectedState) {
-            localStorage.setItem('selected_state_v18', selectedState);
+    }
+
+    // --- Breathing Logic ---
+    let breathingInterval;
+    function toggleBreathing() {
+        const zone = document.getElementById('breathing-zone');
+        const text = document.getElementById('breath-text');
+        
+        if (zone.style.display === 'none' || zone.style.display === '') {
+            zone.style.display = 'block';
+            let phase = 0;
+            const phases = ['دم عمیق...', 'نگه دار...', 'بازدم آرام...', 'نگه دار...'];
+            
+            text.innerText = phases[0];
+            breathingInterval = setInterval(() => {
+                phase = (phase + 1) % 4;
+                text.innerText = phases[phase];
+            }, 4000); 
         } else {
-            localStorage.removeItem('selected_state_v18');
+            zone.style.display = 'none';
+            clearInterval(breathingInterval);
         }
+    }
+
+    // --- Jump to Breathing ---
+    function jumpToBreathing() {
+        const phaseBlock = document.getElementById('breathing-phase-block');
+        const breathZone = document.getElementById('breathing-zone');
+        
+        if (phaseBlock && breathZone) {
+            // اسکرول کردن به بخش تنفس
+            phaseBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
+            // استارت خودکار تنفس اگر خاموش بود
+            if (breathZone.style.display === 'none' || breathZone.style.display === '') {
+                toggleBreathing();
+            }
+        }
+    }
+
+    // --- Oracle Logic ---
+    const wisdomQuotes = [
+        "قوی‌ترین جنگجویانِ بازار، دو چیزند: زمان و صبر. (لئو تولستوی)",
+        "جهانِ بازار، به مثابه اراده و تصور ماست؛ آنچه می‌بینی بازتاب ذهن توست، نه حقیقت عینی. (آرتور شوپنهاور)",
+        "ترید کردن تلاش برای کنترل بازار نیست، بلکه هنر تسلط بر خویشتن است.",
+        "اگر نمی‌توانی احساساتت را هنگام نگاه کردن به چارت متوقف کنی، معامله را متوقف کن.",
+        "پذیرش ضرر، بهایِ دیدنِ واقعیت عریان بازار است.",
+        "در بازار، آن چیزی که می‌خواهی رخ نمی‌دهد، چیزی که هست خودش را نشان می‌دهد."
+    ];
+
+    function generateWisdom() {
+        const inputEl = document.getElementById('belief-input');
+        const randomIndex = Math.floor(Math.random() * wisdomQuotes.length);
+        
+        const displayZone = document.getElementById('belief-display-zone');
+        if(displayZone.style.display === 'block') {
+            clearDailyBelief();
+        }
+        
+        inputEl.value = wisdomQuotes[randomIndex];
+        inputEl.style.transition = "all 0.3s";
+        inputEl.style.backgroundColor = "rgba(139, 92, 246, 0.2)";
+        setTimeout(() => {
+            inputEl.style.backgroundColor = "#0f172a";
+        }, 400);
     }
 
     function checkAndResetDailyBelief() {
@@ -1037,20 +1103,14 @@
             btn.classList.remove('selected', 'selected-warning');
             const btnVal = btn.getAttribute('data-value');
             if (btnVal === option) {
-                if (option === 'indecision') {
-                    btn.classList.add('selected-warning');
-                } else {
-                    btn.classList.add('selected');
-                }
+                if (option === 'indecision') btn.classList.add('selected-warning');
+                else btn.classList.add('selected');
             }
         });
 
         const warningEl = document.getElementById('warning-msg-box');
-        if (option === 'indecision') {
-            warningEl.style.display = 'block';
-        } else {
-            warningEl.style.display = 'none';
-        }
+        if (option === 'indecision') warningEl.style.display = 'block';
+        else warningEl.style.display = 'none';
     }
 
     function selectState(option) {
@@ -1061,28 +1121,19 @@
             btn.classList.remove('selected', 'selected-info');
             const btnVal = btn.getAttribute('data-value');
             if (btnVal === option) {
-                if (option === 'mind') {
-                    btn.classList.add('selected-info');
-                } else {
-                    btn.classList.add('selected');
-                }
+                if (option === 'mind') btn.classList.add('selected-info');
+                else btn.classList.add('selected');
             }
         });
 
         const infoEl = document.getElementById('info-msg-box');
-        if (option === 'mind') {
-            infoEl.style.display = 'block';
-        } else {
-            infoEl.style.display = 'none';
-        }
+        if (option === 'mind') infoEl.style.display = 'block';
+        else infoEl.style.display = 'none';
     }
 
     function handleFinalCheckChange(key, type, value) {
-        if (type === 'checked') {
-            finalChecks[key].checked = value;
-        } else if (type === 'note') {
-            finalChecks[key].note = value;
-        }
+        if (type === 'checked') finalChecks[key].checked = value;
+        else if (type === 'note') finalChecks[key].note = value;
         saveToStorage();
     }
 
@@ -1093,9 +1144,7 @@
 
     function toggleHistoryItem(index) {
         const item = document.getElementById(`history-item-${index}`);
-        if (item) {
-            item.classList.toggle('open');
-        }
+        if (item) item.classList.toggle('open');
     }
 
     function renderSavedTrades() {
@@ -1131,9 +1180,7 @@
             return `
                 <div class="history-item" id="history-item-${index}">
                     <div class="history-header" onclick="toggleHistoryItem(${index})">
-                        <div>
-                            <span style="color: var(--accent-color);">🕒 ${trade.timestamp}</span>
-                        </div>
+                        <div><span style="color: var(--accent-color);">🕒 ${trade.timestamp}</span></div>
                         <span class="history-arrow">▼</span>
                     </div>
                     <div class="history-details">
@@ -1143,38 +1190,23 @@
                         </div>
                         <div class="details-grid">
                             <div class="detail-card">
-                                <div class="detail-card-title">
-                                    <span>ورودی</span>
-                                    <span>${trade.finalChecks.input.checked ? '✔️' : '❌'}</span>
-                                </div>
+                                <div class="detail-card-title"><span>ورودی</span><span>${trade.finalChecks.input.checked ? '✔️' : '❌'}</span></div>
                                 <div class="detail-card-note">${trade.finalChecks.input.note || 'بدون یادداشت'}</div>
                             </div>
                             <div class="detail-card">
-                                <div class="detail-card-title">
-                                    <span>تفسیر</span>
-                                    <span>${trade.finalChecks.interpretation.checked ? '✔️' : '❌'}</span>
-                                </div>
+                                <div class="detail-card-title"><span>تفسیر</span><span>${trade.finalChecks.interpretation.checked ? '✔️' : '❌'}</span></div>
                                 <div class="detail-card-note">${trade.finalChecks.interpretation.note || 'بدون یادداشت'}</div>
                             </div>
                             <div class="detail-card">
-                                <div class="detail-card-title">
-                                    <span>تصمیم</span>
-                                    <span>${trade.finalChecks.decision.checked ? '✔️' : '❌'}</span>
-                                </div>
+                                <div class="detail-card-title"><span>تصمیم</span><span>${trade.finalChecks.decision.checked ? '✔️' : '❌'}</span></div>
                                 <div class="detail-card-note">${trade.finalChecks.decision.note || 'بدون یادداشت'}</div>
                             </div>
                             <div class="detail-card">
-                                <div class="detail-card-title">
-                                    <span>فیدبک</span>
-                                    <span>${trade.finalChecks.feedback.checked ? '✔️' : '❌'}</span>
-                                </div>
+                                <div class="detail-card-title"><span>فیدبک</span><span>${trade.finalChecks.feedback.checked ? '✔️' : '❌'}</span></div>
                                 <div class="detail-card-note">${trade.finalChecks.feedback.note || 'بدون یادداشت'}</div>
                             </div>
                             <div class="detail-card">
-                                <div class="detail-card-title">
-                                    <span>یادگیری</span>
-                                    <span>${trade.finalChecks.learning.checked ? '✔️' : '❌'}</span>
-                                </div>
+                                <div class="detail-card-title"><span>یادگیری</span><span>${trade.finalChecks.learning.checked ? '✔️' : '❌'}</span></div>
                                 <div class="detail-card-note">${trade.finalChecks.learning.note || 'بدون یادداشت'}</div>
                             </div>
                         </div>
@@ -1203,6 +1235,17 @@
         `;
 
         tradeContainer.innerHTML = `
+            <div id="breathing-phase-block" class="phase-block">
+                <div class="phase-title">
+                    <span>🌬️ تنظیم سیستم عصبی</span>
+                    <button class="opt-btn" style="margin-right: auto; max-width: 120px;" onclick="toggleBreathing()">شروع تنفس</button>
+                </div>
+                <div id="breathing-zone" class="breathing-box">
+                    <div class="breath-circle"></div>
+                    <div id="breath-text" class="breath-text">آماده‌ای؟</div>
+                </div>
+            </div>
+
             <div class="phase-block">
                 <div class="phase-title">⏱️ قبل از ترید</div>
                 ${preTasks.map(renderTradeHTML).join('')}
@@ -1210,13 +1253,8 @@
             
             <div class="phase-block">
                 <div class="phase-title">📊 حین ترید (تامل و مانیتورینگ)</div>
-                
                 <div class="flow-box">
-                    <div class="flow-box-title">
-                        <span>🔍</span>
-                        <span>قبل از ورود</span>
-                    </div>
-                    
+                    <div class="flow-box-title"><span>🔍</span><span>قبل از ورود</span></div>
                     <div class="question-card">
                         <span class="question-icon">❓</span>
                         <div class="task-content">
@@ -1224,28 +1262,19 @@
                             <span class="task-meta">دیدن حقیقت عینی بازار بدون دخالت فیلتر امیدها یا ترس‌ها.</span>
                         </div>
                     </div>
-
                     <div class="decision-group">
-                        <div class="decision-title">
-                            <span>🎯</span>
-                            <span>ورود بر اساس چیست؟</span>
-                        </div>
+                        <div class="decision-title"><span>🎯</span><span>ورود بر اساس چیست؟</span></div>
                         <div class="decision-options">
                             <button class="opt-btn opt-decision-btn ${selectedDecision === 'data' ? 'selected' : ''}" data-value="data" onclick="selectDecision('data')">داده</button>
                             <button class="opt-btn opt-decision-btn ${selectedDecision === 'setup' ? 'selected' : ''}" data-value="setup" onclick="selectDecision('setup')">ستاپ</button>
                             <button class="opt-btn opt-decision-btn ${selectedDecision === 'indecision' ? 'selected-warning' : ''}" data-value="indecision" onclick="selectDecision('indecision')">بی‌تصمیمی</button>
                         </div>
-                        <div id="warning-msg-box" class="warning-msg" style="display: ${selectedDecision === 'indecision' ? 'block' : 'none'};">
-                            ⚠️ بهتره تصمیمی نگیری :)
-                        </div>
+                        <div id="warning-msg-box" class="warning-msg" style="display: ${selectedDecision === 'indecision' ? 'block' : 'none'};">⚠️ بهتره تصمیمی نگیری :)</div>
                     </div>
                 </div>
 
                 <div class="interval-timer-card">
-                    <div class="timer-msg">
-                        <span>⏳</span>
-                        <span>قبل از هر تصمیم صبر کن</span>
-                    </div>
+                    <div class="timer-msg"><span>⏳</span><span>قبل از هر تصمیم صبر کن</span></div>
                     <div class="timer-circle-container">
                         <svg class="timer-svg" width="24" height="24" viewBox="0 0 24 24">
                             <circle class="timer-bg-circle" cx="12" cy="12" r="10" />
@@ -1255,22 +1284,16 @@
                 </div>
 
                 <div class="flow-box">
-                    <div class="flow-box-title">
-                        <span>⚡</span>
-                        <span>بعد از ورود</span>
-                    </div>
-                    
+                    <div class="flow-box-title"><span>⚡</span><span>بعد از ورود</span></div>
                     <div class="decision-group">
-                        <div class="decision-title">
-                            <span>❓</span>
-                            <span>وضعیتت حین ترید چیه؟</span>
-                        </div>
+                        <div class="decision-title"><span>❓</span><span>وضعیتت حین ترید چیه؟</span></div>
                         <div class="decision-options">
                             <button class="opt-btn opt-state-btn ${selectedState === 'observer' ? 'selected' : ''}" data-value="observer" onclick="selectState('observer')">شاهد و ناظر</button>
                             <button class="opt-btn opt-state-btn ${selectedState === 'mind' ? 'selected-info' : ''}" data-value="mind" onclick="selectState('mind')">درگیر افکار</button>
                         </div>
                         <div id="info-msg-box" class="info-msg" style="display: ${selectedState === 'mind' ? 'block' : 'none'};">
                             🕊️ میتونی با تنفس عمیق برگردی به لحظه حال.
+                            <button class="jump-to-breath-btn" onclick="jumpToBreathing()">شروع سریع تنفس جعبه‌ای 🌬️</button>
                         </div>
                     </div>
                 </div>
@@ -1281,57 +1304,46 @@
                 ${postTasks.map(renderTradeHTML).join('')}
                 
                 <div class="final-checklist-box">
-                    <div class="flow-box-title">
-                        <span>📝</span>
-                        <span>چک‌لیست و یادداشت نهایی</span>
-                    </div>
-                    
+                    <div class="flow-box-title"><span>📝</span><span>چک‌لیست و یادداشت نهایی</span></div>
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-input" class="final-checkbox" ${finalChecks.input.checked ? 'checked' : ''} onchange="handleFinalCheckChange('input', 'checked', this.checked)">
                             <label for="check-input">ورودی</label>
                         </div>
-                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره ورودی..." value="${finalChecks.input.note}" oninput="handleFinalCheckChange('input', 'note', this.value)">
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه..." value="${finalChecks.input.note}" oninput="handleFinalCheckChange('input', 'note', this.value)">
                     </div>
-
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-interpretation" class="final-checkbox" ${finalChecks.interpretation.checked ? 'checked' : ''} onchange="handleFinalCheckChange('interpretation', 'checked', this.checked)">
                             <label for="check-interpretation">تفسیر</label>
                         </div>
-                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره تفسیر..." value="${finalChecks.interpretation.note}" oninput="handleFinalCheckChange('interpretation', 'note', this.value)">
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه..." value="${finalChecks.interpretation.note}" oninput="handleFinalCheckChange('interpretation', 'note', this.value)">
                     </div>
-
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-decision" class="final-checkbox" ${finalChecks.decision.checked ? 'checked' : ''} onchange="handleFinalCheckChange('decision', 'checked', this.checked)">
                             <label for="check-decision">تصمیم</label>
                         </div>
-                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره تصمیم..." value="${finalChecks.decision.note}" oninput="handleFinalCheckChange('decision', 'note', this.value)">
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه..." value="${finalChecks.decision.note}" oninput="handleFinalCheckChange('decision', 'note', this.value)">
                     </div>
-
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-feedback" class="final-checkbox" ${finalChecks.feedback.checked ? 'checked' : ''} onchange="handleFinalCheckChange('feedback', 'checked', this.checked)">
                             <label for="check-feedback">فیدبک</label>
                         </div>
-                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره فیدبک..." value="${finalChecks.feedback.note}" oninput="handleFinalCheckChange('feedback', 'note', this.value)">
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه..." value="${finalChecks.feedback.note}" oninput="handleFinalCheckChange('feedback', 'note', this.value)">
                     </div>
-
                     <div class="final-item">
                         <div class="final-header">
                             <input type="checkbox" id="check-learning" class="final-checkbox" ${finalChecks.learning.checked ? 'checked' : ''} onchange="handleFinalCheckChange('learning', 'checked', this.checked)">
                             <label for="check-learning">یادگیری</label>
                         </div>
-                        <input type="text" class="final-input" placeholder="یادداشت کوتاه درباره یادگیری..." value="${finalChecks.learning.note}" oninput="handleFinalCheckChange('learning', 'note', this.value)">
+                        <input type="text" class="final-input" placeholder="یادداشت کوتاه..." value="${finalChecks.learning.note}" oninput="handleFinalCheckChange('learning', 'note', this.value)">
                     </div>
                 </div>
 
                 <div class="trader-notes-box">
-                    <div class="flow-box-title">
-                        <span>💭</span>
-                        <span>یادداشت و توضیحات تریدر</span>
-                    </div>
+                    <div class="flow-box-title"><span>💭</span><span>یادداشت و توضیحات تریدر</span></div>
                     <textarea class="trader-textarea" placeholder="توضیحات مربوط به ژورنال، روانشناسی، وضعیت مارکت یا مدیریت سرمایه را اینجا بنویسید..." oninput="handleFreeNotesChange(this.value)">${traderFreeNotes}</textarea>
                 </div>
             </div>
@@ -1353,7 +1365,6 @@
         devListContainer.innerHTML = `
             <div class="section-title">🌅 تمرینات صبحگاهی</div>
             ${morningTasks.map(renderDevHTML).join('')}
-            
             <div class="section-title">🗓️ تمرینات روزانه</div>
             ${dailyTasks.map(renderDevHTML).join('')}
         `;
@@ -1395,7 +1406,6 @@
     function resetActiveChecklist() {
         if (activeTab === 'trade') {
             if (confirm("آیا از ریست کردن چک‌لیست ترید مطمئنید؟ (اطلاعات فعلی در تاریخچه ذخیره خواهد شد)")) {
-                
                 const now = new Date();
                 const persianTime = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit' });
                 const persianDate = now.toLocaleDateString('fa-IR');
@@ -1410,9 +1420,7 @@
                 };
 
                 savedTrades.unshift(newTradeRecord);
-                if (savedTrades.length > 5) {
-                    savedTrades = savedTrades.slice(0, 5);
-                }
+                if (savedTrades.length > 5) savedTrades = savedTrades.slice(0, 5);
 
                 tradeTasks = JSON.parse(JSON.stringify(defaultTradeTasks));
                 selectedDecision = null;
@@ -1440,26 +1448,9 @@
 
     function updateLiveClock() {
         const now = new Date();
-        
-        const timeString = now.toLocaleTimeString('fa-IR', { 
-            hour: '2-digit', 
-            minute: '2-digit', 
-            second: '2-digit' 
-        });
-        
-        const dateString = now.toLocaleDateString('fa-IR', { 
-            weekday: 'long', 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-        });
-
-        const gregorianString = now.toLocaleDateString('en-US', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+        const timeString = now.toLocaleTimeString('fa-IR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const dateString = now.toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        const gregorianString = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
         document.getElementById('live-time').innerText = timeString;
         document.getElementById('live-date').innerText = dateString;
