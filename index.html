@@ -12,11 +12,11 @@
     <title>چک‌لیست ترید تراپیست - تم کندلی</title>
     
     <!-- اضافه کردن ورژن به فایل مانیفست برای دریافت تغییرات جدید PWA -->
-    <link rel="manifest" href="manifest.json?v=2.0">
+    <link rel="manifest" href="manifest.json?v=2.1">
     <meta name="theme-color" content="#131722">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png?v=2.0">
+    <link rel="apple-touch-icon" href="icon-192.png?v=2.1">
 
     <style>
         :root {
@@ -872,7 +872,6 @@
 <div class="app-container">
     <button id="music-toggle" class="music-btn" onclick="toggleMusic()" title="موسیقی تمرکز">🎧</button>
     <audio id="bg-audio" loop>
-        <!-- فایل صوتی نیازی به تغییر ورژن ندارد مگر اینکه بخواهید آهنگ جدیدی بگذارید -->
         <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
     </audio>
 
@@ -958,11 +957,34 @@
 </div>
 
 <script>
+    // --- کدهای جدید ثبت Service Worker برای آپدیت خودکار ---
     if ('serviceWorker' in navigator) {
-        // اضافه کردن ورژن به فایل سرویس ورکر برای عبور از کش‌های قدیمی PWA
-        navigator.serviceWorker.register('sw.js?v=2.0')
-            .then(() => console.log('سرویس ورکر با موفقیت ثبت شد.'))
+        // حتما عدد ورژن در انتهای آدرس با ورژن داخل sw.js یکی باشد
+        navigator.serviceWorker.register('sw.js?v=2.1')
+            .then(reg => {
+                console.log('سرویس ورکر با موفقیت ثبت شد.');
+                
+                // بررسی برای آپدیت‌های جدید در پس‌زمینه
+                reg.addEventListener('updatefound', () => {
+                    const newWorker = reg.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        // وقتی سرویس ورکر جدید نصب شد
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            console.log('نسخه جدید در دسترس است! رفرش خودکار...');
+                        }
+                    });
+                });
+            })
             .catch(err => console.log('خطا در ثبت سرویس ورکر:', err));
+
+        // وقتی سرویس ورکر جدید به طور کامل کنترل را به دست گرفت، صفحه را رفرش کن
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                window.location.reload();
+                refreshing = true;
+            }
+        });
     }
 
     const philosophicalLensDB = {
