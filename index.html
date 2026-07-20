@@ -3,24 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>چک‌لیست ترید تراپیست</title>
     
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <!-- تگ‌های متای ضد کش برای جلوگیری از ذخیره شدن فایل HTML مرورگر -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>چک‌لیست ترید تراپیست - تم کندلی</title>
+    
+    <!-- اضافه کردن ورژن به فایل مانیفست برای دریافت تغییرات جدید PWA -->
+    <link rel="manifest" href="manifest.json?v=2.0">
+    <meta name="theme-color" content="#131722">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png?v=2.0">
 
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f8fafc;
-            --accent-color: #06b6d4;
-            --border-color: #334155;
-            --text-muted: #94a3b8;
-            --danger-color: #ef4444;
-            --success-color: #10b981;
+            --bg-color: #131722;
+            --card-bg: #1e222d;
+            --text-color: #d1d4dc;
+            --accent-color: #2962ff;
+            --border-color: #2a2e39;
+            --text-muted: #787b86;
+            --danger-color: #ef4444; /* رنگ کندل نزولی */
+            --success-color: #22c55e; /* رنگ کندل صعودی */
             --warning-color: #f59e0b;
             --info-color: #3b82f6;
         }
@@ -50,7 +57,7 @@
             background-color: var(--card-bg);
             border-radius: 16px;
             padding: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
             position: relative;
         }
@@ -74,10 +81,10 @@
             align-items: center;
         }
         .music-btn.playing {
-            background-color: rgba(6, 182, 212, 0.2);
-            color: var(--accent-color);
-            border-color: var(--accent-color);
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            background-color: rgba(34, 197, 94, 0.2);
+            color: var(--success-color);
+            border-color: var(--success-color);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
             animation: pulse 2s infinite;
         }
         @keyframes pulse {
@@ -95,8 +102,11 @@
 
         header h1 {
             font-size: 1.3rem;
-            color: var(--accent-color);
+            color: var(--text-color);
             font-weight: bold;
+        }
+        header h1 span {
+            color: var(--success-color);
         }
 
         .live-clock-container {
@@ -105,7 +115,7 @@
             align-items: center;
             gap: 4px;
             margin-top: 10px;
-            background-color: rgba(15, 23, 42, 0.4);
+            background-color: #131722;
             padding: 6px 14px;
             border-radius: 14px;
             border: 1px solid var(--border-color);
@@ -126,7 +136,7 @@
         }
 
         #live-time {
-            color: var(--warning-color);
+            color: var(--success-color);
             font-variant-numeric: tabular-nums;
             font-family: 'Courier New', Courier, monospace, 'Segoe UI';
         }
@@ -136,8 +146,8 @@
         }
 
         .daily-belief-section {
-            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(59, 130, 246, 0.05));
-            border: 1px solid rgba(6, 182, 212, 0.3);
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.08), rgba(41, 98, 255, 0.05));
+            border: 1px solid rgba(34, 197, 94, 0.3);
             border-radius: 12px;
             padding: 12px;
             margin-bottom: 16px;
@@ -146,7 +156,7 @@
         .belief-title {
             font-size: 0.85rem;
             font-weight: bold;
-            color: var(--accent-color);
+            color: var(--success-color);
             margin-bottom: 8px;
             display: flex;
             align-items: center;
@@ -160,7 +170,7 @@
 
         .belief-input {
             flex: 1;
-            background-color: #0f172a;
+            background-color: #131722;
             border: 1px solid var(--border-color);
             color: var(--text-color);
             border-radius: 8px;
@@ -171,12 +181,12 @@
         }
 
         .belief-input:focus {
-            border-color: var(--accent-color);
+            border-color: var(--success-color);
         }
 
         .belief-btn {
-            background-color: var(--accent-color);
-            color: #0f172a;
+            background-color: var(--success-color);
+            color: #131722;
             border: none;
             border-radius: 8px;
             padding: 0 14px;
@@ -191,8 +201,8 @@
         }
 
         .belief-display-box {
-            background-color: rgba(15, 23, 42, 0.6);
-            border: 1px dashed rgba(6, 182, 212, 0.4);
+            background-color: rgba(19, 23, 34, 0.8);
+            border: 1px dashed rgba(34, 197, 94, 0.4);
             padding: 12px;
             border-radius: 8px;
             text-align: center;
@@ -218,11 +228,10 @@
             color: var(--danger-color);
         }
 
-        /* --- Oracle Button --- */
         .oracle-btn {
-            background-color: rgba(139, 92, 246, 0.1);
-            border: 1px solid rgba(139, 92, 246, 0.4);
-            color: #c4b5fd;
+            background-color: rgba(41, 98, 255, 0.1);
+            border: 1px solid rgba(41, 98, 255, 0.4);
+            color: #93c5fd;
             padding: 8px 12px;
             border-radius: 8px;
             cursor: pointer;
@@ -233,8 +242,8 @@
             transition: all 0.2s;
         }
         .oracle-btn:hover {
-            background-color: rgba(139, 92, 246, 0.2);
-            border-color: #8b5cf6;
+            background-color: rgba(41, 98, 255, 0.2);
+            border-color: var(--accent-color);
             color: #fff;
         }
 
@@ -247,7 +256,7 @@
         .tab-btn {
             flex: 1;
             padding: 10px;
-            background-color: #1e293b;
+            background-color: #131722;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
             border-radius: 8px;
@@ -259,9 +268,9 @@
         }
 
         .tab-btn.active {
-            background-color: var(--accent-color);
-            color: #0f172a;
-            border-color: var(--accent-color);
+            background-color: var(--success-color);
+            color: #131722;
+            border-color: var(--success-color);
         }
 
         .checklist-container {
@@ -273,7 +282,7 @@
         }
 
         .phase-block {
-            background-color: rgba(15, 23, 42, 0.4);
+            background-color: rgba(19, 23, 34, 0.5);
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 12px;
@@ -282,7 +291,7 @@
 
         .phase-title {
             font-size: 0.9rem;
-            color: var(--accent-color);
+            color: var(--success-color);
             margin-bottom: 12px;
             padding-bottom: 6px;
             border-bottom: 2px solid var(--border-color);
@@ -292,9 +301,8 @@
             gap: 6px;
         }
 
-        /* --- Box Breathing Animation --- */
         .breathing-box {
-            background-color: rgba(15, 23, 42, 0.6);
+            background-color: rgba(19, 23, 34, 0.8);
             border: 1px dashed var(--info-color);
             border-radius: 10px;
             padding: 20px;
@@ -326,7 +334,7 @@
 
         .section-title {
             font-size: 0.85rem;
-            color: var(--accent-color);
+            color: var(--success-color);
             margin: 16px 0 8px 0;
             padding-bottom: 4px;
             border-bottom: 1px dashed var(--border-color);
@@ -339,7 +347,7 @@
         .task-card {
             display: flex;
             align-items: center;
-            background-color: #0f172a;
+            background-color: #131722;
             border: 1px solid var(--border-color);
             padding: 12px;
             border-radius: 10px;
@@ -353,7 +361,7 @@
         }
 
         .flow-box {
-            background-color: #0f172a;
+            background-color: #131722;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 12px;
@@ -363,17 +371,17 @@
         .flow-box-title {
             font-size: 0.8rem;
             font-weight: bold;
-            color: var(--accent-color);
+            color: var(--success-color);
             margin-bottom: 10px;
             padding-bottom: 4px;
-            border-bottom: 1px solid #1e293b;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
         .interval-timer-card {
-            background-color: #0f172a;
+            background-color: #131722;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 8px 12px;
@@ -408,7 +416,7 @@
 
         .timer-bg-circle {
             fill: none;
-            stroke: #1e293b;
+            stroke: #1e222d;
             stroke-width: 3;
         }
 
@@ -430,10 +438,11 @@
         .question-card {
             display: flex;
             align-items: center;
-            background-color: #1e293b;
+            background-color: #1e222d;
             padding: 10px;
             border-radius: 8px;
             margin-bottom: 10px;
+            border: 1px solid var(--border-color);
         }
 
         .question-icon {
@@ -480,12 +489,13 @@
         .decision-options {
             display: flex;
             gap: 6px;
+            flex-wrap: wrap;
         }
 
         .opt-btn {
             flex: 1;
             padding: 6px 4px;
-            background-color: #1e293b;
+            background-color: #1e222d;
             border: 1px solid var(--border-color);
             color: var(--text-muted);
             border-radius: 6px;
@@ -494,23 +504,29 @@
             font-weight: bold;
             transition: all 0.2s;
             text-align: center;
+            white-space: nowrap;
+        }
+
+        .opt-btn:hover {
+            border-color: var(--success-color);
+            color: var(--success-color);
         }
 
         .opt-btn.selected {
-            background-color: var(--accent-color);
-            color: #0f172a;
-            border-color: var(--accent-color);
+            background-color: var(--success-color);
+            color: #131722;
+            border-color: var(--success-color);
         }
 
         .opt-btn.selected-warning {
-            background-color: var(--warning-color);
-            color: #0f172a;
-            border-color: var(--warning-color);
+            background-color: var(--danger-color);
+            color: #fff;
+            border-color: var(--danger-color);
         }
 
         .opt-btn.selected-info {
             background-color: var(--info-color);
-            color: #f8fafc;
+            color: #fff;
             border-color: var(--info-color);
         }
 
@@ -518,9 +534,9 @@
             display: none;
             margin-top: 8px;
             padding: 8px;
-            background-color: rgba(245, 158, 11, 0.1);
-            border: 1px solid var(--warning-color);
-            color: var(--warning-color);
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
             border-radius: 6px;
             font-size: 0.75rem;
             font-weight: bold;
@@ -544,7 +560,6 @@
             animation: fadeIn 0.2s ease-out;
         }
 
-        /* --- Jump to Breathing Button --- */
         .jump-to-breath-btn {
             display: block;
             margin: 8px auto 0;
@@ -565,7 +580,7 @@
         }
 
         .final-checklist-box, .trader-notes-box {
-            background-color: #0f172a;
+            background-color: #131722;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             padding: 12px;
@@ -597,7 +612,7 @@
             align-items: center;
             justify-content: center;
             transition: all 0.2s;
-            background-color: #1e293b;
+            background-color: #1e222d;
         }
 
         .final-checkbox:checked {
@@ -607,7 +622,7 @@
 
         .final-checkbox:checked::after {
             content: "✓";
-            color: #0f172a;
+            color: #131722;
             font-size: 0.75rem;
             font-weight: bold;
         }
@@ -615,7 +630,7 @@
         .final-input {
             width: calc(100% - 24px);
             margin-right: 24px;
-            background-color: #1e293b;
+            background-color: #1e222d;
             border: 1px solid var(--border-color);
             color: var(--text-color);
             border-radius: 6px;
@@ -626,14 +641,14 @@
         }
 
         .final-input:focus, .trader-textarea:focus {
-            border-color: var(--accent-color);
-            box-shadow: 0 0 4px rgba(6, 182, 212, 0.2);
+            border-color: var(--success-color);
+            box-shadow: 0 0 4px rgba(34, 197, 94, 0.2);
         }
 
         .trader-textarea {
             width: 100%;
             height: 80px;
-            background-color: #1e293b;
+            background-color: #1e222d;
             border: 1px solid var(--border-color);
             color: var(--text-color);
             border-radius: 8px;
@@ -646,7 +661,7 @@
         }
 
         .history-section {
-            background-color: rgba(15, 23, 42, 0.6);
+            background-color: rgba(19, 23, 34, 0.6);
             border: 1px dashed var(--border-color);
             border-radius: 12px;
             padding: 12px;
@@ -656,7 +671,7 @@
         .history-title {
             font-size: 0.9rem;
             font-weight: bold;
-            color: var(--accent-color);
+            color: var(--success-color);
             margin-bottom: 10px;
             display: flex;
             align-items: center;
@@ -690,7 +705,7 @@
         .history-details {
             display: none;
             padding: 12px;
-            background-color: #0f172a;
+            background-color: #131722;
             border-top: 1px solid var(--border-color);
             font-size: 0.75rem;
             line-height: 1.6;
@@ -706,11 +721,12 @@
             margin-left: 4px;
         }
 
-        .badge-data { background-color: rgba(6, 182, 212, 0.2); color: var(--accent-color); }
-        .badge-setup { background-color: rgba(16, 185, 129, 0.2); color: var(--success-color); }
-        .badge-indecision { background-color: rgba(245, 158, 11, 0.2); color: var(--warning-color); }
-        .badge-observer { background-color: rgba(16, 185, 129, 0.2); color: var(--success-color); }
+        .badge-data { background-color: rgba(41, 98, 255, 0.2); color: #93c5fd; }
+        .badge-setup { background-color: rgba(34, 197, 94, 0.2); color: var(--success-color); }
+        .badge-indecision { background-color: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
+        .badge-observer { background-color: rgba(34, 197, 94, 0.2); color: var(--success-color); }
         .badge-mind { background-color: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+        .badge-error { background-color: rgba(239, 68, 68, 0.2); color: var(--danger-color); }
 
         .details-grid { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 8px; }
         .detail-card {
@@ -719,7 +735,7 @@
             border-radius: 6px;
             border: 1px solid var(--border-color);
         }
-        .detail-card-title { font-weight: bold; color: var(--accent-color); margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .detail-card-title { font-weight: bold; color: var(--success-color); margin-bottom: 4px; display: flex; justify-content: space-between; }
         .detail-card-note { color: var(--text-muted); font-style: italic; }
 
         .history-trader-note-box {
@@ -747,12 +763,12 @@
             height: 32px;
         }
 
-        .task-card.completed { border-color: #059669; opacity: 0.85; }
+        .task-card.completed { border-color: var(--success-color); opacity: 0.85; }
         .task-card.completed .task-title { color: var(--text-muted); text-decoration: line-through; }
-        .task-card.completed .task-meta { color: #059669; }
+        .task-card.completed .task-meta { color: var(--success-color); }
 
         .chart-box {
-            background-color: #0f172a;
+            background-color: #131722;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 16px;
@@ -764,7 +780,7 @@
 
         .chart-visual { position: relative; width: 100px; height: 100px; }
         .chart-svg { transform: rotate(-90deg); }
-        .chart-bg-circle { fill: none; stroke: #1e293b; stroke-width: 8; }
+        .chart-bg-circle { fill: none; stroke: #1e222d; stroke-width: 8; }
         .chart-fill-circle {
             fill: none;
             stroke: var(--success-color);
@@ -811,19 +827,57 @@
         }
         .reset-btn:hover { background-color: rgba(239, 68, 68, 0.1); border-color: var(--danger-color); }
 
+        /* --- Philosophical Modal CSS --- */
+        .philo-modal-container {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(19, 23, 34, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+        .show-philo-modal { display: flex; }
+        .philo-modal-content {
+            background: linear-gradient(145deg, #1e222d, #131722);
+            border-right: 4px solid var(--success-color);
+            border-radius: 8px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            color: #d1d4dc;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            font-family: 'Georgia', 'Vazirmatn', serif; 
+        }
+        .philo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        .philo-icon { color: var(--success-color); font-size: 1em; letter-spacing: 1px; font-weight: bold; }
+        #philo-title { font-size: 1.4em; margin-bottom: 15px; color: #ffffff; margin-top: 0; }
+        #philo-text { font-size: 1.1em; line-height: 1.9; margin-bottom: 25px; color: #cbd5e1; font-style: italic; }
+        .philo-author-tag { display: inline-block; background-color: #2a2e39; padding: 5px 12px; border-radius: 4px; font-size: 0.9em; color: var(--success-color); }
+        .close-btn { background: none; border: none; color: var(--text-muted); font-size: 2em; cursor: pointer; line-height: 1; padding: 0; }
+        .close-btn:hover { color: #ffffff; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- Music Button -->
     <button id="music-toggle" class="music-btn" onclick="toggleMusic()" title="موسیقی تمرکز">🎧</button>
     <audio id="bg-audio" loop>
+        <!-- فایل صوتی نیازی به تغییر ورژن ندارد مگر اینکه بخواهید آهنگ جدیدی بگذارید -->
         <source src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3" type="audio/mpeg">
     </audio>
 
     <header>
-        <h1>چک‌لیست ترید تراپیست</h1>
+        <h1>چک‌لیست ترید <span>تراپیست</span></h1>
         <div class="live-clock-container">
             <div class="clock-time-row">
                 <span id="live-time">۰۰:۰۰:۰۰</span>
@@ -837,7 +891,7 @@
     </header>
 
     <div class="daily-belief-section">
-        <div class="belief-title">🧠 کد و باور روانشناختی امروز من:</div>
+        <div class="belief-title">📈 کد و باور روانشناختی امروز من:</div>
         <div id="belief-input-zone" class="belief-input-group">
             <input type="text" id="belief-input" class="belief-input" placeholder="باور یا قانون امروزت رو بنویس...">
             <button class="belief-btn" onclick="saveDailyBelief()">ثبت باور</button>
@@ -855,10 +909,8 @@
         <button class="tab-btn" onclick="switchTab('dev')">چک‌لیست تمرینات روزانه</button>
     </div>
 
-    <!-- Trade Checklist -->
     <div id="trade-checklist" class="checklist-container active"></div>
 
-    <!-- Development Checklist -->
     <div id="dev-checklist" class="checklist-container">
         <div id="dev-tasks-list"></div>
         <div class="chart-box">
@@ -882,7 +934,6 @@
         </div>
     </div>
 
-    <!-- History Section -->
     <div class="history-section">
         <div class="history-title">📊 ۵ معامله آخر (تاریخچه)</div>
         <div id="history-container" class="history-list"></div>
@@ -894,12 +945,48 @@
     </footer>
 </div>
 
+<div id="philo-modal" class="philo-modal-container">
+    <div class="philo-modal-content">
+        <div class="philo-header">
+            <span class="philo-icon">👁️ لنز فلسفی بازار</span>
+            <button onclick="closePhilosophicalLens()" class="close-btn">&times;</button>
+        </div>
+        <h3 id="philo-title">عنوان</h3>
+        <p id="philo-text">متن پیام</p>
+        <span id="philo-author" class="philo-author-tag">نویسنده</span>
+    </div>
+</div>
+
 <script>
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js')
+        // اضافه کردن ورژن به فایل سرویس ورکر برای عبور از کش‌های قدیمی PWA
+        navigator.serviceWorker.register('sw.js?v=2.0')
             .then(() => console.log('سرویس ورکر با موفقیت ثبت شد.'))
             .catch(err => console.log('خطا در ثبت سرویس ورکر:', err));
     }
+
+    const philosophicalLensDB = {
+        "fomo": {
+            philosopher: "آرتور شوپنهاور",
+            title: "اراده‌ی کور و چرخه‌ی رنج",
+            text: "این ترس از جا ماندن (FOMO) که حس می‌کنی، تجلی همان «اراده‌ی کور» است. تو در یک عطش بی‌پایان برای تصاحب سود گرفتار شده‌ای. تا زمانی که این اراده را با منطق مهار نکنی، بازار برایت چیزی جز رنج و اضطراب نخواهد داشت. آرام باش و تماشا کن."
+        },
+        "blame_market": {
+            philosopher: "ژان‌پل سارتر",
+            title: "خودفریبی و پذیرش مسئولیت",
+            text: "تو با آزادی مطلق دکمه‌ی ورود به این معامله را فشار دادی. مقصر دانستن استاپ‌هانتِرها، اخبار یا بروکر، صرفاً فرار از مسئولیت و نوعی «خودفریبی» (Bad Faith) است. عواقب انتخابت را در آغوش بگیر تا به عنوان یک تریدر آزاد شوی."
+        },
+        "stubbornness": {
+            philosopher: "خوزه اورتگا ای گاست",
+            title: "من و شرایطم",
+            text: "«من، خودم و شرایطم هستم.» اصرار بر جهت‌گیریِ قبلی‌ات در حالی که ساختار بازار تغییر کرده، انکار واقعیت است. استراتژیِ تو تنها زمانی معنا دارد که با شرایطِ اکنونِ چارت تطبیق پیدا کند. بپذیر که شرایط تغییر کرده است."
+        },
+        "revenge_trade": {
+            philosopher: "آرتور شوپنهاور / رواقیون",
+            title: "بردگیِ احساسات",
+            text: "تلاش برای انتقام از بازار، یعنی واگذار کردنِ کنترلِ ذهن به یک نیروی خارجی (چارت). تو نمی‌توانی بازار را تنبیه کنی، بلکه تنها سرمایه و روانِ خودت را می‌سوزانی. تو یک معامله‌گری، نه یک قماربازِ خشمگین."
+        }
+    };
 
     const defaultTradeTasks = [
         { id: 1, title: "مدیتیشن و تمرکز ذهنی", meta: "آرامش درونی و حضور صد درصدی در لحظه حال", category: "pre", completed: false },
@@ -922,17 +1009,22 @@
 
     let activeTab = 'trade';
 
-    let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v20')) || defaultTradeTasks;
-    let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v20')) || defaultDevTasks;
-    let selectedDecision = localStorage.getItem('selected_decision_v20') || null;
-    let selectedState = localStorage.getItem('selected_state_v20') || null;
-    let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v20')) || [];
-    let traderFreeNotes = localStorage.getItem('trader_free_notes_v20') || "";
+    let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v22')) || defaultTradeTasks;
+    let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v22')) || defaultDevTasks;
+    let customDevTasks = JSON.parse(localStorage.getItem('custom_dev_tasks_v22')) || [];
+    let useCustomTasks = JSON.parse(localStorage.getItem('use_custom_tasks_v22'));
+    if (useCustomTasks === null) useCustomTasks = true;
 
-    let dailyBelief = localStorage.getItem('daily_belief_v20') || "";
-    let lastSavedDate = localStorage.getItem('belief_saved_date_v20') || "";
+    let selectedDecision = localStorage.getItem('selected_decision_v22') || null;
+    let selectedState = localStorage.getItem('selected_state_v22') || null;
+    let selectedPsychError = localStorage.getItem('selected_psych_error_v22') || 'none';
+    let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v22')) || [];
+    let traderFreeNotes = localStorage.getItem('trader_free_notes_v22') || "";
 
-    let finalChecks = JSON.parse(localStorage.getItem('final_checks_v20')) || {
+    let dailyBelief = localStorage.getItem('daily_belief_v22') || "";
+    let lastSavedDate = localStorage.getItem('belief_saved_date_v22') || "";
+
+    let finalChecks = JSON.parse(localStorage.getItem('final_checks_v22')) || {
         input: { checked: false, note: "" },
         interpretation: { checked: false, note: "" },
         decision: { checked: false, note: "" },
@@ -941,20 +1033,22 @@
     };
 
     function saveToStorage() {
-        localStorage.setItem('trade_tasks_v20', JSON.stringify(tradeTasks));
-        localStorage.setItem('dev_tasks_v20', JSON.stringify(devTasks));
-        localStorage.setItem('final_checks_v20', JSON.stringify(finalChecks));
-        localStorage.setItem('saved_trades_v20', JSON.stringify(savedTrades));
-        localStorage.setItem('trader_free_notes_v20', traderFreeNotes);
-        localStorage.setItem('daily_belief_v20', dailyBelief);
-        localStorage.setItem('belief_saved_date_v20', lastSavedDate);
-        if (selectedDecision) localStorage.setItem('selected_decision_v20', selectedDecision);
-        else localStorage.removeItem('selected_decision_v20');
-        if (selectedState) localStorage.setItem('selected_state_v20', selectedState);
-        else localStorage.removeItem('selected_state_v20');
+        localStorage.setItem('trade_tasks_v22', JSON.stringify(tradeTasks));
+        localStorage.setItem('dev_tasks_v22', JSON.stringify(devTasks));
+        localStorage.setItem('custom_dev_tasks_v22', JSON.stringify(customDevTasks));
+        localStorage.setItem('use_custom_tasks_v22', JSON.stringify(useCustomTasks));
+        localStorage.setItem('final_checks_v22', JSON.stringify(finalChecks));
+        localStorage.setItem('saved_trades_v22', JSON.stringify(savedTrades));
+        localStorage.setItem('trader_free_notes_v22', traderFreeNotes);
+        localStorage.setItem('selected_psych_error_v22', selectedPsychError);
+        localStorage.setItem('daily_belief_v22', dailyBelief);
+        localStorage.setItem('belief_saved_date_v22', lastSavedDate);
+        if (selectedDecision) localStorage.setItem('selected_decision_v22', selectedDecision);
+        else localStorage.removeItem('selected_decision_v22');
+        if (selectedState) localStorage.setItem('selected_state_v22', selectedState);
+        else localStorage.removeItem('selected_state_v22');
     }
 
-    // --- Music Logic ---
     const bgAudio = document.getElementById('bg-audio');
     const musicBtn = document.getElementById('music-toggle');
     bgAudio.volume = 0.3; 
@@ -969,7 +1063,6 @@
         }
     }
 
-    // --- Breathing Logic ---
     let breathingInterval;
     function toggleBreathing() {
         const zone = document.getElementById('breathing-zone');
@@ -991,23 +1084,18 @@
         }
     }
 
-    // --- Jump to Breathing ---
     function jumpToBreathing() {
         const phaseBlock = document.getElementById('breathing-phase-block');
         const breathZone = document.getElementById('breathing-zone');
         
         if (phaseBlock && breathZone) {
-            // اسکرول کردن به بخش تنفس
             phaseBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-            // استارت خودکار تنفس اگر خاموش بود
             if (breathZone.style.display === 'none' || breathZone.style.display === '') {
                 toggleBreathing();
             }
         }
     }
 
-    // --- Oracle Logic ---
     const wisdomQuotes = [
         "قوی‌ترین جنگجویانِ بازار، دو چیزند: زمان و صبر. (لئو تولستوی)",
         "جهانِ بازار، به مثابه اراده و تصور ماست؛ آنچه می‌بینی بازتاب ذهن توست، نه حقیقت عینی. (آرتور شوپنهاور)",
@@ -1028,9 +1116,9 @@
         
         inputEl.value = wisdomQuotes[randomIndex];
         inputEl.style.transition = "all 0.3s";
-        inputEl.style.backgroundColor = "rgba(139, 92, 246, 0.2)";
+        inputEl.style.backgroundColor = "rgba(34, 197, 94, 0.2)";
         setTimeout(() => {
-            inputEl.style.backgroundColor = "#0f172a";
+            inputEl.style.backgroundColor = "#131722";
         }, 400);
     }
 
@@ -1081,8 +1169,14 @@
     }
 
     function updateChart() {
-        const total = devTasks.length;
-        const completedCount = devTasks.filter(t => t.completed).length;
+        let total = devTasks.length;
+        let completedCount = devTasks.filter(t => t.completed).length;
+
+        if (useCustomTasks) {
+            total += customDevTasks.length;
+            completedCount += customDevTasks.filter(t => t.completed).length;
+        }
+
         const todoCount = total - completedCount;
         const percentage = total > 0 ? Math.round((completedCount / total) * 100) : 0;
 
@@ -1131,6 +1225,29 @@
         else infoEl.style.display = 'none';
     }
 
+    function handlePsychErrorChange(value) {
+        selectedPsychError = value;
+        saveToStorage();
+        if (value !== 'none') {
+            triggerPhilosophicalLens(value);
+        }
+    }
+
+    function triggerPhilosophicalLens(errorType) {
+        const insight = philosophicalLensDB[errorType];
+        if (insight) {
+            document.getElementById('philo-author').innerText = insight.philosopher;
+            document.getElementById('philo-title').innerText = insight.title;
+            document.getElementById('philo-text').innerText = insight.text;
+            const modal = document.getElementById('philo-modal');
+            modal.classList.add('show-philo-modal');
+        }
+    }
+
+    function closePhilosophicalLens() {
+        document.getElementById('philo-modal').classList.remove('show-philo-modal');
+    }
+
     function handleFinalCheckChange(key, type, value) {
         if (type === 'checked') finalChecks[key].checked = value;
         else if (type === 'note') finalChecks[key].note = value;
@@ -1167,9 +1284,20 @@
             return { text: 'ثبت‌نشده', badge: '' };
         };
 
+        const translatePsych = (val) => {
+            if (val === 'fomo') return { text: 'FOMO', badge: 'badge-error' };
+            if (val === 'blame_market') return { text: 'فرار از مسئولیت', badge: 'badge-error' };
+            if (val === 'stubbornness') return { text: 'لجاجت با مارکت', badge: 'badge-error' };
+            if (val === 'revenge_trade') return { text: 'ترید انتقامی', badge: 'badge-error' };
+            return null;
+        };
+
         container.innerHTML = savedTrades.map((trade, index) => {
             const decInfo = translateDecision(trade.decision);
             const stateInfo = translateState(trade.state);
+            const psychInfo = translatePsych(trade.psychError);
+
+            const psychHTML = psychInfo ? `<span class="summary-badge ${psychInfo.badge}">${psychInfo.text}</span>` : '';
 
             const notesHTML = trade.freeNotes ? `
                 <div class="history-trader-note-box">
@@ -1180,13 +1308,14 @@
             return `
                 <div class="history-item" id="history-item-${index}">
                     <div class="history-header" onclick="toggleHistoryItem(${index})">
-                        <div><span style="color: var(--accent-color);">🕒 ${trade.timestamp}</span></div>
+                        <div><span style="color: var(--success-color);">🕒 ${trade.timestamp}</span></div>
                         <span class="history-arrow">▼</span>
                     </div>
                     <div class="history-details">
                         <div style="margin-bottom: 8px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
-                            <strong>مبنای ورود:</strong> <span class="summary-badge ${decInfo.badge}">${decInfo.text}</span> | 
-                            <strong>وضعیت ذهنی:</strong> <span class="summary-badge ${stateInfo.badge}">${stateInfo.text}</span>
+                            <strong>ورود:</strong> <span class="summary-badge ${decInfo.badge}">${decInfo.text}</span> | 
+                            <strong>ذهن:</strong> <span class="summary-badge ${stateInfo.badge}">${stateInfo.text}</span>
+                            ${psychHTML ? `| <strong>خطا:</strong> ${psychHTML}` : ''}
                         </div>
                         <div class="details-grid">
                             <div class="detail-card">
@@ -1215,6 +1344,40 @@
                 </div>
             `;
         }).join('');
+    }
+
+    function addCustomTask(title = null) {
+        if (!title) {
+            title = document.getElementById('custom-task-input').value.trim();
+        }
+        if (title && customDevTasks.length < 5) {
+            customDevTasks.push({ id: Date.now(), title: title, meta: "تمرین شخصی جدید", completed: false });
+            saveToStorage();
+            renderChecklists();
+            document.getElementById('custom-task-input').value = '';
+        } else if (customDevTasks.length >= 5) {
+            alert('شما تنها مجاز به ساخت حداکثر ۵ تمرین شخصی در لیست هستید.');
+        }
+    }
+
+    function deleteCustomTask(id, event) {
+        event.stopPropagation();
+        customDevTasks = customDevTasks.filter(t => t.id !== id);
+        saveToStorage();
+        renderChecklists();
+    }
+
+    function toggleCustomTasksUse(checked) {
+        useCustomTasks = checked;
+        saveToStorage();
+        renderChecklists();
+    }
+
+    function toggleCustomTaskStatus(id) {
+        const task = customDevTasks.find(t => t.id === id);
+        if (task) task.completed = !task.completed;
+        saveToStorage();
+        renderChecklists();
     }
 
     function renderChecklists() {
@@ -1258,7 +1421,7 @@
                     <div class="question-card">
                         <span class="question-icon">❓</span>
                         <div class="task-content">
-                            <span class="task-title" style="color: var(--accent-color); font-size: 0.85rem;">واقعیت بازار رو میبینم یا داستان ذهنم؟</span>
+                            <span class="task-title" style="color: var(--success-color); font-size: 0.85rem;">واقعیت بازار رو میبینم یا داستان ذهنم؟</span>
                             <span class="task-meta">دیدن حقیقت عینی بازار بدون دخالت فیلتر امیدها یا ترس‌ها.</span>
                         </div>
                     </div>
@@ -1302,6 +1465,20 @@
             <div class="phase-block">
                 <div class="phase-title">📓 بعد از ترید</div>
                 ${postTasks.map(renderTradeHTML).join('')}
+
+                <div class="flow-box" style="margin-top: 12px;">
+                    <div class="flow-box-title"><span>🧠</span><span>تحلیل روانشناختی رفتار</span></div>
+                    <div style="margin-top: 8px;">
+                        <label for="psych-error" style="font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 6px;">خطای روانی مسلط در این معامله:</label>
+                        <select id="psych-error" style="width: 100%; padding: 8px; border-radius: 6px; background-color: #1e222d; color: var(--text-color); border: 1px solid var(--border-color); outline: none;" onchange="handlePsychErrorChange(this.value)">
+                            <option value="none" ${selectedPsychError === 'none' ? 'selected' : ''}>بدون خطای خاصی (منطبق بر پلن)</option>
+                            <option value="fomo" ${selectedPsychError === 'fomo' ? 'selected' : ''}>ترس از جاماندن (FOMO)</option>
+                            <option value="blame_market" ${selectedPsychError === 'blame_market' ? 'selected' : ''}>مقصر دانستن بازار/اخبار</option>
+                            <option value="stubbornness" ${selectedPsychError === 'stubbornness' ? 'selected' : ''}>لجاجت و تعصب روی یک جهت</option>
+                            <option value="revenge_trade" ${selectedPsychError === 'revenge_trade' ? 'selected' : ''}>ترید انتقامی</option>
+                        </select>
+                    </div>
+                </div>
                 
                 <div class="final-checklist-box">
                     <div class="flow-box-title"><span>📝</span><span>چک‌لیست و یادداشت نهایی</span></div>
@@ -1362,11 +1539,51 @@
             </div>
         `;
 
+        const renderCustomDevHTML = (task) => `
+            <div class="task-card ${task.completed ? 'completed' : ''}" style="opacity: ${useCustomTasks ? '1' : '0.5'}" onclick="toggleCustomTaskStatus(${task.id})">
+                <button class="status-btn">${task.completed ? '✔️' : '❌'}</button>
+                <div class="task-content">
+                    <span class="task-title">${task.title}</span>
+                    <span class="task-meta">${task.meta}</span>
+                </div>
+                <button style="background:none; border:none; color:var(--danger-color); cursor:pointer; font-size:1.1rem; padding: 4px;" onclick="deleteCustomTask(${task.id}, event)">🗑️</button>
+            </div>
+        `;
+
         devListContainer.innerHTML = `
             <div class="section-title">🌅 تمرینات صبحگاهی</div>
             ${morningTasks.map(renderDevHTML).join('')}
             <div class="section-title">🗓️ تمرینات روزانه</div>
             ${dailyTasks.map(renderDevHTML).join('')}
+            
+            <div class="section-title" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                🛠️ تمرینات شخصی (تا ۵ مورد)
+                <label class="toggle-switch" style="margin-right: auto;" title="محاسبه در نمودار درصد">
+                    <input type="checkbox" onchange="toggleCustomTasksUse(this.checked)" ${useCustomTasks ? 'checked' : ''}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+            
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
+                با فعال‌سازی دکمه بالا، انجام این لیست در درصد پیشرفت نمودار شما محاسبه می‌شود.
+            </div>
+
+            <div class="decision-options" style="margin-bottom: 10px;">
+                <button class="opt-btn" onclick="addCustomTask('تغذیه سالم')">+ تغذیه سالم</button>
+                <button class="opt-btn" onclick="addCustomTask('تمرین صبر')">+ تمرین صبر</button>
+                <button class="opt-btn" onclick="addCustomTask('تمرین مسئولیت')">+ مسئولیت‌پذیری</button>
+                <button class="opt-btn" onclick="addCustomTask('تمرین شکرگزاری')">+ تمرین شکرگزاری</button>
+                <button class="opt-btn" onclick="addCustomTask('ترید و ارسال ژورنال')">+ ارسال ژورنال</button>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                <input type="text" id="custom-task-input" class="belief-input" placeholder="تمرین شخصی جدید..." style="flex: 1;">
+                <button class="belief-btn" onclick="addCustomTask()">افزودن</button>
+            </div>
+
+            <div id="custom-tasks-list">
+                ${customDevTasks.map(renderCustomDevHTML).join('')}
+            </div>
         `;
 
         updateChart();
@@ -1415,6 +1632,7 @@
                     timestamp: `${persianTime} - ${persianDate}`,
                     decision: selectedDecision || 'none',
                     state: selectedState || 'none',
+                    psychError: selectedPsychError || 'none',
                     finalChecks: JSON.parse(JSON.stringify(finalChecks)),
                     freeNotes: traderFreeNotes
                 };
@@ -1425,6 +1643,7 @@
                 tradeTasks = JSON.parse(JSON.stringify(defaultTradeTasks));
                 selectedDecision = null;
                 selectedState = null;
+                selectedPsychError = 'none';
                 traderFreeNotes = "";
                 finalChecks = {
                     input: { checked: false, note: "" },
@@ -1440,6 +1659,7 @@
         } else {
             if (confirm("آیا مطمئن هستید که می‌خواهید تمرینات روزانه را ریست کنید؟")) {
                 devTasks = JSON.parse(JSON.stringify(defaultDevTasks));
+                customDevTasks.forEach(t => t.completed = false);
                 saveToStorage();
                 renderChecklists();
             }
