@@ -3,20 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چک‌لیست ترید تراپیست - تم کندلی پیشرفته</title>
     
-    <!-- تگ‌های متای ضد کش برای جلوگیری از ذخیره شدن فایل HTML مرورگر -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    
-    <title>چک‌لیست ترید تراپیست - تم کندلی</title>
-    
-    <!-- اضافه کردن ورژن به فایل مانیفست برای دریافت تغییرات جدید PWA -->
-    <link rel="manifest" href="manifest.json?v=2.1">
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#131722">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png?v=2.1">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- اضافه کردن کتابخانه SheetJS برای خروجی اکسل -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
@@ -26,10 +22,11 @@
             --accent-color: #2962ff;
             --border-color: #2a2e39;
             --text-muted: #787b86;
-            --danger-color: #ef4444; /* رنگ کندل نزولی */
-            --success-color: #22c55e; /* رنگ کندل صعودی */
+            --danger-color: #ef4444; 
+            --success-color: #22c55e; 
             --warning-color: #f59e0b;
             --info-color: #3b82f6;
+            --purple-color: #a855f7;
         }
 
         * {
@@ -143,6 +140,46 @@
 
         .clock-divider {
             color: var(--border-color);
+        }
+
+        /* --- Advanced AI Risk Sentinel Bar --- */
+        .risk-sentinel-bar {
+            background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(41, 98, 255, 0.1));
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .sentinel-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .sentinel-title {
+            font-size: 0.75rem;
+            color: var(--purple-color);
+            font-weight: bold;
+        }
+        .sentinel-status {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #fff;
+        }
+        .sentinel-gauge {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #131722;
+            border: 2px solid var(--purple-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: var(--purple-color);
         }
 
         .daily-belief-section {
@@ -675,7 +712,22 @@
             margin-bottom: 10px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+        }
+
+        .export-json-btn {
+            background: rgba(41, 98, 255, 0.15);
+            border: 1px solid var(--info-color);
+            color: #93c5fd;
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .export-json-btn:hover {
+            background: var(--info-color);
+            color: #fff;
         }
 
         .history-list { display: flex; flex-direction: column; gap: 8px; }
@@ -889,6 +941,14 @@
         </div>
     </header>
 
+    <div class="risk-sentinel-bar">
+        <div class="sentinel-info">
+            <span class="sentinel-title">🛡️ هوش مصنوعی تحلیل ریسک ذهنی</span>
+            <span id="sentinel-status-text" class="sentinel-status">وضعیت پایدار - آماده معامله منطقی</span>
+        </div>
+        <div id="sentinel-gauge-val" class="sentinel-gauge">0%</div>
+    </div>
+
     <div class="daily-belief-section">
         <div class="belief-title">📈 کد و باور روانشناختی امروز من:</div>
         <div id="belief-input-zone" class="belief-input-group">
@@ -934,7 +994,11 @@
     </div>
 
     <div class="history-section">
-        <div class="history-title">📊 ۵ معامله آخر (تاریخچه)</div>
+        <div class="history-title">
+            <span>📊 ۵ معامله آخر (تاریخچه)</span>
+            <!-- دکمه جدید برای دانلود فایل اکسل جایگزین JSON شده است -->
+            <button class="export-json-btn" onclick="exportTradesExcel()">📥 دانلود ژورنال (Excel)</button>
+        </div>
         <div id="history-container" class="history-list"></div>
     </div>
 
@@ -957,57 +1021,17 @@
 </div>
 
 <script>
-    // --- کدهای جدید ثبت Service Worker برای آپدیت خودکار ---
     if ('serviceWorker' in navigator) {
-        // حتما عدد ورژن در انتهای آدرس با ورژن داخل sw.js یکی باشد
-        navigator.serviceWorker.register('sw.js?v=2.1')
-            .then(reg => {
-                console.log('سرویس ورکر با موفقیت ثبت شد.');
-                
-                // بررسی برای آپدیت‌های جدید در پس‌زمینه
-                reg.addEventListener('updatefound', () => {
-                    const newWorker = reg.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        // وقتی سرویس ورکر جدید نصب شد
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log('نسخه جدید در دسترس است! رفرش خودکار...');
-                        }
-                    });
-                });
-            })
+        navigator.serviceWorker.register('sw.js')
+            .then(() => console.log('سرویس ورکر با موفقیت ثبت شد.'))
             .catch(err => console.log('خطا در ثبت سرویس ورکر:', err));
-
-        // وقتی سرویس ورکر جدید به طور کامل کنترل را به دست گرفت، صفحه را رفرش کن
-        let refreshing = false;
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (!refreshing) {
-                window.location.reload();
-                refreshing = true;
-            }
-        });
     }
 
     const philosophicalLensDB = {
-        "fomo": {
-            philosopher: "آرتور شوپنهاور",
-            title: "اراده‌ی کور و چرخه‌ی رنج",
-            text: "این ترس از جا ماندن (FOMO) که حس می‌کنی، تجلی همان «اراده‌ی کور» است. تو در یک عطش بی‌پایان برای تصاحب سود گرفتار شده‌ای. تا زمانی که این اراده را با منطق مهار نکنی، بازار برایت چیزی جز رنج و اضطراب نخواهد داشت. آرام باش و تماشا کن."
-        },
-        "blame_market": {
-            philosopher: "ژان‌پل سارتر",
-            title: "خودفریبی و پذیرش مسئولیت",
-            text: "تو با آزادی مطلق دکمه‌ی ورود به این معامله را فشار دادی. مقصر دانستن استاپ‌هانتِرها، اخبار یا بروکر، صرفاً فرار از مسئولیت و نوعی «خودفریبی» (Bad Faith) است. عواقب انتخابت را در آغوش بگیر تا به عنوان یک تریدر آزاد شوی."
-        },
-        "stubbornness": {
-            philosopher: "خوزه اورتگا ای گاست",
-            title: "من و شرایطم",
-            text: "«من، خودم و شرایطم هستم.» اصرار بر جهت‌گیریِ قبلی‌ات در حالی که ساختار بازار تغییر کرده، انکار واقعیت است. استراتژیِ تو تنها زمانی معنا دارد که با شرایطِ اکنونِ چارت تطبیق پیدا کند. بپذیر که شرایط تغییر کرده است."
-        },
-        "revenge_trade": {
-            philosopher: "آرتور شوپنهاور / رواقیون",
-            title: "بردگیِ احساسات",
-            text: "تلاش برای انتقام از بازار، یعنی واگذار کردنِ کنترلِ ذهن به یک نیروی خارجی (چارت). تو نمی‌توانی بازار را تنبیه کنی، بلکه تنها سرمایه و روانِ خودت را می‌سوزانی. تو یک معامله‌گری، نه یک قماربازِ خشمگین."
-        }
+        "fomo": { philosopher: "آرتور شوپنهاور", title: "اراده‌ی کور و چرخه‌ی رنج", text: "این ترس از جا ماندن (FOMO) که حس می‌کنی، تجلی همان «اراده‌ی کور» است..." },
+        "blame_market": { philosopher: "ژان‌پل سارتر", title: "خودفریبی و پذیرش مسئولیت", text: "تو با آزادی مطلق دکمه‌ی ورود به این معامله را فشار دادی..." },
+        "stubbornness": { philosopher: "خوزه اورتگا ای گاست", title: "من و شرایطم", text: "«من، خودم و شرایطم هستم.» اصرار بر جهت‌گیریِ قبلی‌ات در حالی که ساختار بازار تغییر کرده..." },
+        "revenge_trade": { philosopher: "آرتور شوپنهاور / رواقیون", title: "بردگیِ احساسات", text: "تلاش برای انتقام از بازار، یعنی واگذار کردنِ کنترلِ ذهن به یک نیروی خارجی..." }
     };
 
     const defaultTradeTasks = [
@@ -1031,44 +1055,77 @@
 
     let activeTab = 'trade';
 
-    let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v22')) || defaultTradeTasks;
-    let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v22')) || defaultDevTasks;
-    let customDevTasks = JSON.parse(localStorage.getItem('custom_dev_tasks_v22')) || [];
-    let useCustomTasks = JSON.parse(localStorage.getItem('use_custom_tasks_v22'));
+    let tradeTasks = JSON.parse(localStorage.getItem('trade_tasks_v23')) || defaultTradeTasks;
+    let devTasks = JSON.parse(localStorage.getItem('dev_tasks_v23')) || defaultDevTasks;
+    let customDevTasks = JSON.parse(localStorage.getItem('custom_dev_tasks_v23')) || [];
+    let useCustomTasks = JSON.parse(localStorage.getItem('use_custom_tasks_v23'));
     if (useCustomTasks === null) useCustomTasks = true;
 
-    let selectedDecision = localStorage.getItem('selected_decision_v22') || null;
-    let selectedState = localStorage.getItem('selected_state_v22') || null;
-    let selectedPsychError = localStorage.getItem('selected_psych_error_v22') || 'none';
-    let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v22')) || [];
-    let traderFreeNotes = localStorage.getItem('trader_free_notes_v22') || "";
+    let selectedDecision = localStorage.getItem('selected_decision_v23') || null;
+    let selectedState = localStorage.getItem('selected_state_v23') || null;
+    let selectedPsychError = localStorage.getItem('selected_psych_error_v23') || 'none';
+    let savedTrades = JSON.parse(localStorage.getItem('saved_trades_v23')) || [];
+    let traderFreeNotes = localStorage.getItem('trader_free_notes_v23') || "";
 
-    let dailyBelief = localStorage.getItem('daily_belief_v22') || "";
-    let lastSavedDate = localStorage.getItem('belief_saved_date_v22') || "";
+    let dailyBelief = localStorage.getItem('daily_belief_v23') || "";
+    let lastSavedDate = localStorage.getItem('belief_saved_date_v23') || "";
 
-    let finalChecks = JSON.parse(localStorage.getItem('final_checks_v22')) || {
-        input: { checked: false, note: "" },
-        interpretation: { checked: false, note: "" },
-        decision: { checked: false, note: "" },
-        feedback: { checked: false, note: "" },
+    let finalChecks = JSON.parse(localStorage.getItem('final_checks_v23')) || {
+        input: { checked: false, note: "" }, interpretation: { checked: false, note: "" },
+        decision: { checked: false, note: "" }, feedback: { checked: false, note: "" },
         learning: { checked: false, note: "" }
     };
 
     function saveToStorage() {
-        localStorage.setItem('trade_tasks_v22', JSON.stringify(tradeTasks));
-        localStorage.setItem('dev_tasks_v22', JSON.stringify(devTasks));
-        localStorage.setItem('custom_dev_tasks_v22', JSON.stringify(customDevTasks));
-        localStorage.setItem('use_custom_tasks_v22', JSON.stringify(useCustomTasks));
-        localStorage.setItem('final_checks_v22', JSON.stringify(finalChecks));
-        localStorage.setItem('saved_trades_v22', JSON.stringify(savedTrades));
-        localStorage.setItem('trader_free_notes_v22', traderFreeNotes);
-        localStorage.setItem('selected_psych_error_v22', selectedPsychError);
-        localStorage.setItem('daily_belief_v22', dailyBelief);
-        localStorage.setItem('belief_saved_date_v22', lastSavedDate);
-        if (selectedDecision) localStorage.setItem('selected_decision_v22', selectedDecision);
-        else localStorage.removeItem('selected_decision_v22');
-        if (selectedState) localStorage.setItem('selected_state_v22', selectedState);
-        else localStorage.removeItem('selected_state_v22');
+        localStorage.setItem('trade_tasks_v23', JSON.stringify(tradeTasks));
+        localStorage.setItem('dev_tasks_v23', JSON.stringify(devTasks));
+        localStorage.setItem('custom_dev_tasks_v23', JSON.stringify(customDevTasks));
+        localStorage.setItem('use_custom_tasks_v23', useCustomTasks);
+        localStorage.setItem('final_checks_v23', JSON.stringify(finalChecks));
+        localStorage.setItem('saved_trades_v23', JSON.stringify(savedTrades));
+        localStorage.setItem('trader_free_notes_v23', traderFreeNotes);
+        localStorage.setItem('selected_psych_error_v23', selectedPsychError);
+        localStorage.setItem('daily_belief_v23', dailyBelief);
+        localStorage.setItem('belief_saved_date_v23', lastSavedDate);
+        if (selectedDecision) localStorage.setItem('selected_decision_v23', selectedDecision);
+        else localStorage.removeItem('selected_decision_v23');
+        if (selectedState) localStorage.setItem('selected_state_v23', selectedState);
+        else localStorage.removeItem('selected_state_v23');
+
+        updateRiskSentinel();
+    }
+
+    function updateRiskSentinel() {
+        let riskScore = 0;
+        const incompletePre = tradeTasks.filter(t => t.category === 'pre' && !t.completed).length;
+        riskScore += incompletePre * 10;
+        if (selectedDecision === 'indecision') riskScore += 30;
+        if (selectedState === 'mind') riskScore += 25;
+        if (selectedPsychError !== 'none') riskScore += 40;
+        if (riskScore > 100) riskScore = 100;
+
+        const gaugeEl = document.getElementById('sentinel-gauge-val');
+        const statusEl = document.getElementById('sentinel-status-text');
+
+        if (gaugeEl && statusEl) {
+            gaugeEl.innerText = `${riskScore}%`;
+            if (riskScore < 30) {
+                gaugeEl.style.color = 'var(--success-color)';
+                gaugeEl.style.borderColor = 'var(--success-color)';
+                statusEl.style.color = 'var(--success-color)';
+                statusEl.innerText = 'وضعیت پایدار - ذهن آرام و مسلط';
+            } else if (riskScore < 70) {
+                gaugeEl.style.color = 'var(--warning-color)';
+                gaugeEl.style.borderColor = 'var(--warning-color)';
+                statusEl.style.color = 'var(--warning-color)';
+                statusEl.innerText = 'هشدار متوسط - مراقب سوگیری‌های شناختی باشید';
+            } else {
+                gaugeEl.style.color = 'var(--danger-color)';
+                gaugeEl.style.borderColor = 'var(--danger-color)';
+                statusEl.style.color = 'var(--danger-color)';
+                statusEl.innerText = '🚨 خطر بالا! سیستم عصبی تحت فشار - ترید ممنوع!';
+            }
+        }
     }
 
     const bgAudio = document.getElementById('bg-audio');
@@ -1109,7 +1166,6 @@
     function jumpToBreathing() {
         const phaseBlock = document.getElementById('breathing-phase-block');
         const breathZone = document.getElementById('breathing-zone');
-        
         if (phaseBlock && breathZone) {
             phaseBlock.scrollIntoView({ behavior: 'smooth', block: 'start' });
             if (breathZone.style.display === 'none' || breathZone.style.display === '') {
@@ -1120,36 +1176,25 @@
 
     const wisdomQuotes = [
         "قوی‌ترین جنگجویانِ بازار، دو چیزند: زمان و صبر. (لئو تولستوی)",
-        "جهانِ بازار، به مثابه اراده و تصور ماست؛ آنچه می‌بینی بازتاب ذهن توست، نه حقیقت عینی. (آرتور شوپنهاور)",
         "ترید کردن تلاش برای کنترل بازار نیست، بلکه هنر تسلط بر خویشتن است.",
-        "اگر نمی‌توانی احساساتت را هنگام نگاه کردن به چارت متوقف کنی، معامله را متوقف کن.",
-        "پذیرش ضرر، بهایِ دیدنِ واقعیت عریان بازار است.",
-        "در بازار، آن چیزی که می‌خواهی رخ نمی‌دهد، چیزی که هست خودش را نشان می‌دهد."
+        "پذیرش ضرر، بهایِ دیدنِ واقعیت عریان بازار است."
     ];
 
     function generateWisdom() {
         const inputEl = document.getElementById('belief-input');
         const randomIndex = Math.floor(Math.random() * wisdomQuotes.length);
-        
         const displayZone = document.getElementById('belief-display-zone');
-        if(displayZone.style.display === 'block') {
-            clearDailyBelief();
-        }
-        
+        if(displayZone.style.display === 'block') clearDailyBelief();
         inputEl.value = wisdomQuotes[randomIndex];
         inputEl.style.transition = "all 0.3s";
         inputEl.style.backgroundColor = "rgba(34, 197, 94, 0.2)";
-        setTimeout(() => {
-            inputEl.style.backgroundColor = "#131722";
-        }, 400);
+        setTimeout(() => { inputEl.style.backgroundColor = "#131722"; }, 400);
     }
 
     function checkAndResetDailyBelief() {
         const todayStr = new Date().toLocaleDateString('en-US'); 
         if (lastSavedDate && lastSavedDate !== todayStr) {
-            dailyBelief = "";
-            lastSavedDate = "";
-            saveToStorage();
+            dailyBelief = ""; lastSavedDate = ""; saveToStorage();
         }
         renderDailyBelief();
     }
@@ -1158,35 +1203,24 @@
         const inputEl = document.getElementById('belief-input');
         const val = inputEl.value.trim();
         if(val) {
-            dailyBelief = val;
-            lastSavedDate = new Date().toLocaleDateString('en-US');
-            saveToStorage();
-            renderDailyBelief();
-            inputEl.value = "";
+            dailyBelief = val; lastSavedDate = new Date().toLocaleDateString('en-US');
+            saveToStorage(); renderDailyBelief(); inputEl.value = "";
         }
     }
 
     function clearDailyBelief(event) {
         if(event) event.stopPropagation(); 
-        dailyBelief = "";
-        lastSavedDate = "";
-        saveToStorage();
-        renderDailyBelief();
+        dailyBelief = ""; lastSavedDate = ""; saveToStorage(); renderDailyBelief();
     }
 
     function renderDailyBelief() {
         const inputZone = document.getElementById('belief-input-zone');
         const displayZone = document.getElementById('belief-display-zone');
         const textEl = document.getElementById('belief-text');
-
         if(dailyBelief) {
-            inputZone.style.display = 'none';
-            displayZone.style.display = 'block';
-            textEl.innerText = dailyBelief;
+            inputZone.style.display = 'none'; displayZone.style.display = 'block'; textEl.innerText = dailyBelief;
         } else {
-            inputZone.style.display = 'flex';
-            displayZone.style.display = 'none';
-            textEl.innerText = "";
+            inputZone.style.display = 'flex'; displayZone.style.display = 'none'; textEl.innerText = "";
         }
     }
 
@@ -1201,7 +1235,6 @@
 
         const todoCount = total - completedCount;
         const percentage = total > 0 ? Math.round((completedCount / total) * 100) : 0;
-
         const circumference = 2 * Math.PI * 40;
         const offset = circumference - (percentage / 100) * circumference;
 
@@ -1212,9 +1245,7 @@
     }
 
     function selectDecision(option) {
-        selectedDecision = option;
-        saveToStorage();
-        
+        selectedDecision = option; saveToStorage();
         document.querySelectorAll('.opt-decision-btn').forEach(btn => {
             btn.classList.remove('selected', 'selected-warning');
             const btnVal = btn.getAttribute('data-value');
@@ -1223,16 +1254,13 @@
                 else btn.classList.add('selected');
             }
         });
-
         const warningEl = document.getElementById('warning-msg-box');
         if (option === 'indecision') warningEl.style.display = 'block';
         else warningEl.style.display = 'none';
     }
 
     function selectState(option) {
-        selectedState = option;
-        saveToStorage();
-
+        selectedState = option; saveToStorage();
         document.querySelectorAll('.opt-state-btn').forEach(btn => {
             btn.classList.remove('selected', 'selected-info');
             const btnVal = btn.getAttribute('data-value');
@@ -1241,18 +1269,14 @@
                 else btn.classList.add('selected');
             }
         });
-
         const infoEl = document.getElementById('info-msg-box');
         if (option === 'mind') infoEl.style.display = 'block';
         else infoEl.style.display = 'none';
     }
 
     function handlePsychErrorChange(value) {
-        selectedPsychError = value;
-        saveToStorage();
-        if (value !== 'none') {
-            triggerPhilosophicalLens(value);
-        }
+        selectedPsychError = value; saveToStorage();
+        if (value !== 'none') triggerPhilosophicalLens(value);
     }
 
     function triggerPhilosophicalLens(errorType) {
@@ -1261,8 +1285,7 @@
             document.getElementById('philo-author').innerText = insight.philosopher;
             document.getElementById('philo-title').innerText = insight.title;
             document.getElementById('philo-text').innerText = insight.text;
-            const modal = document.getElementById('philo-modal');
-            modal.classList.add('show-philo-modal');
+            document.getElementById('philo-modal').classList.add('show-philo-modal');
         }
     }
 
@@ -1277,13 +1300,75 @@
     }
 
     function handleFreeNotesChange(value) {
-        traderFreeNotes = value;
-        saveToStorage();
+        traderFreeNotes = value; saveToStorage();
     }
 
     function toggleHistoryItem(index) {
         const item = document.getElementById(`history-item-${index}`);
         if (item) item.classList.toggle('open');
+    }
+
+    // --- تابع جدید و بهینه شده جهت خروجی فایل اکسل ---
+    function exportTradesExcel() {
+        if (savedTrades.length === 0) {
+            alert('هیچ معامله‌ای برای دانلود وجود ندارد.');
+            return;
+        }
+
+        // تبدیل داده‌های لوکال هاست به ساختار خوانا برای اکسل
+        const excelData = savedTrades.map((trade, index) => {
+            const translateDecision = (val) => {
+                if (val === 'data') return 'داده';
+                if (val === 'setup') return 'ستاپ';
+                if (val === 'indecision') return 'بی‌تصمیمی';
+                return 'ثبت‌نشده';
+            };
+            const translateState = (val) => {
+                if (val === 'observer') return 'شاهد و ناظر';
+                if (val === 'mind') return 'درگیر افکار';
+                return 'ثبت‌نشده';
+            };
+            const translatePsych = (val) => {
+                if (val === 'fomo') return 'FOMO';
+                if (val === 'blame_market') return 'فرار از مسئولیت';
+                if (val === 'stubbornness') return 'لجاجت با مارکت';
+                if (val === 'revenge_trade') return 'ترید انتقامی';
+                return 'بدون خطا';
+            };
+
+            return {
+                "ردیف": index + 1,
+                "تاریخ و زمان": trade.timestamp,
+                "مبنای ورود": translateDecision(trade.decision),
+                "وضعیت ذهن": translateState(trade.state),
+                "خطای روانی": translatePsych(trade.psychError),
+                "ورودی (انجام)": trade.finalChecks.input.checked ? '✔️' : '❌',
+                "ورودی (یادداشت)": trade.finalChecks.input.note || '-',
+                "تفسیر (انجام)": trade.finalChecks.interpretation.checked ? '✔️' : '❌',
+                "تفسیر (یادداشت)": trade.finalChecks.interpretation.note || '-',
+                "تصمیم (انجام)": trade.finalChecks.decision.checked ? '✔️' : '❌',
+                "تصمیم (یادداشت)": trade.finalChecks.decision.note || '-',
+                "فیدبک (انجام)": trade.finalChecks.feedback.checked ? '✔️' : '❌',
+                "فیدبک (یادداشت)": trade.finalChecks.feedback.note || '-',
+                "یادگیری (انجام)": trade.finalChecks.learning.checked ? '✔️' : '❌',
+                "یادگیری (یادداشت)": trade.finalChecks.learning.note || '-',
+                "یادداشت آزاد تریدر": trade.freeNotes || '-'
+            };
+        });
+
+        // ایجاد فایل شیت به کمک SheetJS
+        const ws = XLSX.utils.json_to_sheet(excelData);
+
+        // اعمال دایرکشن راست‌چین به شیت
+        if(!ws["!views"]) ws["!views"] = [];
+        ws["!views"].push({ rightToLeft: true });
+
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "ژورنال معاملات");
+
+        // ایجاد فایل و دانلود
+        const fileName = `Trade_Journal_${Date.now()}.xlsx`;
+        XLSX.writeFile(wb, fileName);
     }
 
     function renderSavedTrades() {
@@ -1320,7 +1405,6 @@
             const psychInfo = translatePsych(trade.psychError);
 
             const psychHTML = psychInfo ? `<span class="summary-badge ${psychInfo.badge}">${psychInfo.text}</span>` : '';
-
             const notesHTML = trade.freeNotes ? `
                 <div class="history-trader-note-box">
                     <strong>📝 یادداشت تریدر:</strong><br>${trade.freeNotes}
@@ -1369,14 +1453,10 @@
     }
 
     function addCustomTask(title = null) {
-        if (!title) {
-            title = document.getElementById('custom-task-input').value.trim();
-        }
+        if (!title) title = document.getElementById('custom-task-input').value.trim();
         if (title && customDevTasks.length < 5) {
             customDevTasks.push({ id: Date.now(), title: title, meta: "تمرین شخصی جدید", completed: false });
-            saveToStorage();
-            renderChecklists();
-            document.getElementById('custom-task-input').value = '';
+            saveToStorage(); renderChecklists(); document.getElementById('custom-task-input').value = '';
         } else if (customDevTasks.length >= 5) {
             alert('شما تنها مجاز به ساخت حداکثر ۵ تمرین شخصی در لیست هستید.');
         }
@@ -1385,21 +1465,17 @@
     function deleteCustomTask(id, event) {
         event.stopPropagation();
         customDevTasks = customDevTasks.filter(t => t.id !== id);
-        saveToStorage();
-        renderChecklists();
+        saveToStorage(); renderChecklists();
     }
 
     function toggleCustomTasksUse(checked) {
-        useCustomTasks = checked;
-        saveToStorage();
-        renderChecklists();
+        useCustomTasks = checked; saveToStorage(); renderChecklists();
     }
 
     function toggleCustomTaskStatus(id) {
         const task = customDevTasks.find(t => t.id === id);
         if (task) task.completed = !task.completed;
-        saveToStorage();
-        renderChecklists();
+        saveToStorage(); renderChecklists();
     }
 
     function renderChecklists() {
@@ -1580,21 +1656,16 @@
             
             <div class="section-title" style="margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--border-color);">
                 🛠️ تمرینات شخصی (تا ۵ مورد)
-                <label class="toggle-switch" style="margin-right: auto;" title="محاسبه در نمودار درصد">
+                <label class="toggle-switch" style="margin-right: auto;" title="محاسبه در درصد پیشرفت">
                     <input type="checkbox" onchange="toggleCustomTasksUse(this.checked)" ${useCustomTasks ? 'checked' : ''}>
                     <span class="slider"></span>
                 </label>
-            </div>
-            
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">
-                با فعال‌سازی دکمه بالا، انجام این لیست در درصد پیشرفت نمودار شما محاسبه می‌شود.
             </div>
 
             <div class="decision-options" style="margin-bottom: 10px;">
                 <button class="opt-btn" onclick="addCustomTask('تغذیه سالم')">+ تغذیه سالم</button>
                 <button class="opt-btn" onclick="addCustomTask('تمرین صبر')">+ تمرین صبر</button>
                 <button class="opt-btn" onclick="addCustomTask('تمرین مسئولیت')">+ مسئولیت‌پذیری</button>
-                <button class="opt-btn" onclick="addCustomTask('تمرین شکرگزاری')">+ تمرین شکرگزاری</button>
                 <button class="opt-btn" onclick="addCustomTask('ترید و ارسال ژورنال')">+ ارسال ژورنال</button>
             </div>
 
@@ -1610,6 +1681,7 @@
 
         updateChart();
         renderSavedTrades();
+        updateRiskSentinel();
     }
 
     function toggleTask(type, id) {
@@ -1620,8 +1692,7 @@
             const task = devTasks.find(t => t.id === id);
             if (task) task.completed = !task.completed;
         }
-        saveToStorage();
-        renderChecklists();
+        saveToStorage(); renderChecklists();
     }
 
     function switchTab(tab) {
@@ -1663,27 +1734,20 @@
                 if (savedTrades.length > 5) savedTrades = savedTrades.slice(0, 5);
 
                 tradeTasks = JSON.parse(JSON.stringify(defaultTradeTasks));
-                selectedDecision = null;
-                selectedState = null;
-                selectedPsychError = 'none';
-                traderFreeNotes = "";
+                selectedDecision = null; selectedState = null; selectedPsychError = 'none'; traderFreeNotes = "";
                 finalChecks = {
-                    input: { checked: false, note: "" },
-                    interpretation: { checked: false, note: "" },
-                    decision: { checked: false, note: "" },
-                    feedback: { checked: false, note: "" },
+                    input: { checked: false, note: "" }, interpretation: { checked: false, note: "" },
+                    decision: { checked: false, note: "" }, feedback: { checked: false, note: "" },
                     learning: { checked: false, note: "" }
                 };
 
-                saveToStorage();
-                renderChecklists();
+                saveToStorage(); renderChecklists();
             }
         } else {
             if (confirm("آیا مطمئن هستید که می‌خواهید تمرینات روزانه را ریست کنید؟")) {
                 devTasks = JSON.parse(JSON.stringify(defaultDevTasks));
                 customDevTasks.forEach(t => t.completed = false);
-                saveToStorage();
-                renderChecklists();
+                saveToStorage(); renderChecklists();
             }
         }
     }
